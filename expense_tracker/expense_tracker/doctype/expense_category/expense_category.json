@@ -1,0 +1,62 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-03-10 10:14:45.207698",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "category_type",
+  "associated_account_holder",
+  "budget"
+ ],
+ "fields": [
+  {
+   "fieldname": "category_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Category Type",
+   "options": "Food\nTransport\nShopping\nEducation",
+   "reqd": 1
+  },
+  {
+   "fieldname": "budget",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Budget",
+   "non_negative": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "associated_account_holder",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Associated Account Holder ",
+   "options": "Primary Account",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-03-10 10:23:08.641209",
+ "modified_by": "Administrator",
+ "module": "Expense Tracker",
+ "name": "Expense Category",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
