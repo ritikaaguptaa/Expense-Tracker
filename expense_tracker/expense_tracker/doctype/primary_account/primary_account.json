@@ -1,0 +1,76 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-03-10 10:03:03.716605",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "full_name",
+  "email",
+  "salary",
+  "telegram_id",
+  "total_expense"
+ ],
+ "fields": [
+  {
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Full Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Email",
+   "options": "Email",
+   "reqd": 1
+  },
+  {
+   "fieldname": "salary",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Salary",
+   "non_negative": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "telegram_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Telegram ID",
+   "reqd": 1
+  },
+  {
+   "fieldname": "total_expense",
+   "fieldtype": "Currency",
+   "label": "Total Expense",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-03-10 10:09:04.785300",
+ "modified_by": "Administrator",
+ "module": "Expense Tracker",
+ "name": "Primary Account",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

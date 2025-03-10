@@ -1,0 +1,73 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-03-10 10:09:50.508580",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "primary_account_holder",
+  "full_name",
+  "pocket_money",
+  "rollover_savings",
+  "telegram_id",
+  "status"
+ ],
+ "fields": [
+  {
+   "fieldname": "primary_account_holder",
+   "fieldtype": "Data",
+   "label": "Primary Account Holder"
+  },
+  {
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "label": "Full Name"
+  },
+  {
+   "fieldname": "pocket_money",
+   "fieldtype": "Currency",
+   "label": "Pocket Money"
+  },
+  {
+   "fieldname": "rollover_savings",
+   "fieldtype": "Currency",
+   "label": "Rollover Savings"
+  },
+  {
+   "fieldname": "telegram_id",
+   "fieldtype": "Data",
+   "label": "Telegram ID"
+  },
+  {
+   "default": "Active",
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-03-10 10:13:55.354461",
+ "modified_by": "Administrator",
+ "module": "Expense Tracker",
+ "name": "Family Member",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
