@@ -7,8 +7,9 @@
  "field_order": [
   "full_name",
   "email",
-  "salary",
   "telegram_id",
+  "salary",
+  "default_pocket_money_for_dependents",
   "total_expense"
  ],
  "fields": [
@@ -36,6 +37,7 @@
    "reqd": 1
   },
   {
+   "description": "Get Telegram ID: Open Telegram \u2192 Search @userinfobot \u2192 Start bot \u2192 Copy & paste ID.",
    "fieldname": "telegram_id",
    "fieldtype": "Data",
    "in_list_view": 1,
@@ -47,11 +49,18 @@
    "fieldtype": "Currency",
    "label": "Total Expense",
    "read_only": 1
+  },
+  {
+   "fieldname": "default_pocket_money_for_dependents",
+   "fieldtype": "Currency",
+   "label": "Default Pocket Money for Dependents",
+   "non_negative": 1,
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-10 10:09:04.785300",
+ "modified": "2025-03-10 10:57:47.417883",
  "modified_by": "Administrator",
  "module": "Expense Tracker",
  "name": "Primary Account",
