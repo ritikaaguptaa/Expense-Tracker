@@ -16,21 +16,38 @@
   {
    "fieldname": "primary_account_holder",
    "fieldtype": "Data",
-   "label": "Primary Account Holder"
+   "in_list_view": 1,
+   "label": "Primary Account Holder",
+   "reqd": 1
   },
   {
    "fieldname": "full_name",
    "fieldtype": "Data",
-   "label": "Full Name"
+   "in_list_view": 1,
+   "label": "Full Name",
+   "reqd": 1
   },
   {
    "fieldname": "pocket_money",
    "fieldtype": "Currency",
-   "label": "Pocket Money"
+   "in_list_view": 1,
+   "label": "Pocket Money",
+   "non_negative": 1,
+   "reqd": 1
   },
   {
    "fieldname": "rollover_savings",
    "fieldtype": "Currency",
+   "label": "Rollover Savings",
+   "read_only": 1
+  },
+  {
+   "description": "Get Telegram ID: Open Telegram \u2192 Search @userinfobot \u2192 Start bot \u2192 Copy & paste ID.",
+   "fieldname": "telegram_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Telegram ID",
+   "reqd": 1
    "label": "Rollover Savings"
   },
   {
@@ -48,7 +65,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-10 10:13:55.354461",
+ "modified": "2025-03-10 10:58:34.832834",
  "modified_by": "Administrator",
  "module": "Expense Tracker",
  "name": "Family Member",

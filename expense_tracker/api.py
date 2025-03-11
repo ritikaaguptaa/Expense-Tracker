@@ -11,9 +11,49 @@ load_dotenv()
 
 DEEPGRAM_API_KEY = os.getenv("DEEPGRAM_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 AUDIO_FILE_PATH = "expense_tracker/food.mp4"
 
+
+def send_telegram_notification():
+
+        bot_token = BOT_TOKEN
+        chat_id = self.telegram_id.strip()
+
+        if not bot_token or not chat_id:
+            frappe.logger().error("Telegram bot token or chat ID is missing.")
+            return
+
+        # merchant = expense_data.get("merchant", "Unknown Merchant")
+        # category = expense_data.get("category", "General")
+        # amount = expense_data.get("amount", 0.00)
+        # currency = expense_data.get("currency", "INR")
+
+        message = f"""
+        *🛒 Expense Alert!* 💸  
+
+        You have spent *{currency} {amount:.2f}* at *{merchant}*  
+        📌 *Category:* {category}  
+
+        _Track your expenses wisely! 📊_
+        """
+
+        url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+        payload = {
+            "chat_id": chat_id,
+            "text": message,
+            "parse_mode": "MarkdownV2"
+        }
+
+        try:
+            response = requests.post(url, json=payload)
+            response_data = response.json()
+
+            if not response_data.get("ok"):
+                frappe.logger().error(f"Failed to send Telegram notification: {response_data}")
+        except Exception as e:
+            frappe.logger().error(f"Error sending Telegram message: {str(e)}")
 
 def transcribe_audio_sync():
     """Runs async transcription function in a synchronous wrapper."""
