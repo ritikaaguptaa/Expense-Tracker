@@ -148,7 +148,7 @@ app_license = "mit"
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
+scheduler_events = {
 # 	"all": [
 # 		"expense_tracker.tasks.all"
 # 	],
@@ -161,10 +161,10 @@ app_license = "mit"
 # 	"weekly": [
 # 		"expense_tracker.tasks.weekly"
 # 	],
-# 	"monthly": [
-# 		"expense_tracker.tasks.monthly"
-# 	],
-# }
+	"monthly": [
+		"expense_tracker.tasks.monthly_pocket_money_scheduler"
+	],
+}
 
 # Testing
 # -------
