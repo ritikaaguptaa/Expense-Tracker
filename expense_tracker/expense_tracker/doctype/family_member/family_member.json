@@ -48,6 +48,12 @@
    "in_list_view": 1,
    "label": "Telegram ID",
    "reqd": 1
+   "label": "Rollover Savings"
+  },
+  {
+   "fieldname": "telegram_id",
+   "fieldtype": "Data",
+   "label": "Telegram ID"
   },
   {
    "default": "Active",
