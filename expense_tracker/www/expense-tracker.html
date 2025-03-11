@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #e0f2fe, #f0f8ff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Nunito', sans-serif;
+            color: #333;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .container {
+            padding: 50px;
+            border-radius: 16px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+            background: #fff;
+            width: 90%;
+            max-width: 550px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 35px;
+            color: #2c3e50;
+            letter-spacing: -1px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            flex-direction: column;
+        }
+
+        .manual-btn {
+            background-color: #3498db;
+            color: white;
+            padding: 16px 35px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 6px 18px rgba(52, 152, 219, 0.45);
+        }
+
+        .manual-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 22px rgba(41, 128, 185, 0.55);
+        }
+
+        .mic-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #e7f2fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .circle i {
+            color: #3498db;
+            font-size: 32px;
+            transition: color 0.3s ease;
+        }
+
+        .circle:hover {
+            transform: scale(1.08);
+            box-shadow: 0 7px 18px rgba(0, 0, 0, 0.2);
+        }
+
+        .circle.active {
+            background: #e74c3c;
+        }
+
+        .circle.active i {
+            color: #ffffff;
+        }
+
+        #status {
+            margin-top: 40px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #555;
+            letter-spacing: 0.5px;
+        }
+
+        .wave-container {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .wave {
+            width: 5px;
+            height: 30px;
+            background: #3498db;
+            margin: 0 3px;
+            display: inline-block;
+            border-radius: 10px;
+            animation: wave 1s infinite ease-in-out;
+        }
+
+        .wave:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .wave:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        @keyframes wave {
+            0%, 40%, 100% {
+                transform: translateY(0);
+            }
+            20% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Expense Tracker</h1>
+        <div class="buttons" id="mainButtons">
+            <button class="manual-btn" onclick="redirectToForm()">📄 Add Expense</button>
+            <div class="mic-container">
+                <div class="circle" onclick="startVoice()">
+                    <i class="fas fa-microphone"></i>
+                </div>
+            </div>
+            
+        </div>
+        <div class="wave-container" id="waveContainer">
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+        </div>
+        <p id="status"></p>
+    </div>
+
+    <script>
+        function redirectToForm() {
+            window.location.href = "expense_form.html";
+        }
+    
+        function startVoice() {
+            const statusElement = document.getElementById("status");
+            const micButton = document.querySelector(".circle");
+            const mainButtons = document.getElementById("mainButtons");
+            const waveContainer = document.getElementById("waveContainer");
+    
+            waveContainer.style.display = "flex"; 
+    
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                recognition.continuous = false;
+                recognition.lang = 'en-US';
+                recognition.interimResults = false;
+    
+                recognition.onstart = function () {
+                    statusElement.innerText = "Listening... Speak now.";
+                    micButton.classList.add("active");
+                    mainButtons.classList.add("hidden");
+                    waveContainer.style.display = "flex"; 
+                };
+    
+                recognition.onresult = function (event) {
+                    let transcript = event.results[0][0].transcript;
+                    statusElement.innerText = "You said: " + transcript;
+                    micButton.classList.remove("active");
+                    mainButtons.classList.remove("hidden");
+                    waveContainer.style.display = "none"; 
+                };
+    
+                recognition.onerror = function (event) {
+                    statusElement.innerText = "Error: " + event.error;
+                    micButton.classList.remove("active");
+                    mainButtons.classList.remove("hidden");
+                    waveContainer.style.display = "none"; 
+                };
+    
+                recognition.start();
+            } else {
+                alert("Your browser does not support voice recognition. Try Google Chrome.");
+            }
+        }
+    
+        function showWaveAnimation() {
+            document.getElementById("waveContainer").style.display = "flex";
+        }
+    </script>
+    
+</body>
+
+</html>
