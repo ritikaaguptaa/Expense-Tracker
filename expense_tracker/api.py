@@ -1,6 +1,7 @@
 import asyncio
 import os
 import json
+import requests
 import google.generativeai as genai
 import frappe
 from deepgram import Deepgram
@@ -19,41 +20,41 @@ AUDIO_FILE_PATH = "expense_tracker/food.mp4"
 def send_telegram_notification():
 
         bot_token = BOT_TOKEN
-        chat_id = self.telegram_id.strip()
+        # chat_id = self.telegram_id.strip()
 
-        if not bot_token or not chat_id:
-            frappe.logger().error("Telegram bot token or chat ID is missing.")
-            return
+        # if not bot_token or not chat_id:
+        #     frappe.logger().error("Telegram bot token or chat ID is missing.")
+        #     return
 
         # merchant = expense_data.get("merchant", "Unknown Merchant")
         # category = expense_data.get("category", "General")
         # amount = expense_data.get("amount", 0.00)
         # currency = expense_data.get("currency", "INR")
 
-        message = f"""
-        *🛒 Expense Alert!* 💸  
+        # message = f"""
+        # *🛒 Expense Alert!* 💸  
 
-        You have spent *{currency} {amount:.2f}* at *{merchant}*  
-        📌 *Category:* {category}  
+        # You have spent *{currency} {amount:.2f}* at *{merchant}*  
+        # 📌 *Category:* {category}  
 
-        _Track your expenses wisely! 📊_
-        """
+        # _Track your expenses wisely! 📊_
+        # """
 
-        url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-        payload = {
-            "chat_id": chat_id,
-            "text": message,
-            "parse_mode": "MarkdownV2"
-        }
+        # url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+        # payload = {
+        #     "chat_id": chat_id,
+        #     "text": message,
+        #     "parse_mode": "MarkdownV2"
+        # }
 
-        try:
-            response = requests.post(url, json=payload)
-            response_data = response.json()
+        # try:
+        #     response = requests.post(url, json=payload)
+        #     response_data = response.json()
 
-            if not response_data.get("ok"):
-                frappe.logger().error(f"Failed to send Telegram notification: {response_data}")
-        except Exception as e:
-            frappe.logger().error(f"Error sending Telegram message: {str(e)}")
+        #     if not response_data.get("ok"):
+        #         frappe.logger().error(f"Failed to send Telegram notification: {response_data}")
+        # except Exception as e:
+        #     frappe.logger().error(f"Error sending Telegram message: {str(e)}")
 
 def transcribe_audio_sync():
     """Runs async transcription function in a synchronous wrapper."""
