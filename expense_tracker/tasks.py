@@ -272,3 +272,103 @@ def extract_and_notify(text, escaped_transcript, chat_id):
         frappe.db.commit()
     else:
         send_telegram_message(chat_id, "❌ Sorry, we couldn't extract the details from the text provided.")
+
+def weekly_spending_summary():
+
+    family_members = frappe.get_all(
+        "Family Member",
+        fields=["full_name", "telegram_id", "pocket_money", "primary_account_holder"],
+    )
+
+    current_week = datetime.datetime.now().isocalendar()[1]
+    total_weeks = 4
+
+    remaining_weeks = total_weeks - ((current_week - 1) % total_weeks)
+
+    for member in family_members:
+
+        chat_id = member.telegram_id.strip()
+
+        categories = frappe.get_all(
+            "Expense Category",
+            filters={"associated_account_holder": member.primary_account_holder},
+            fields=["category_type"],
+        )
+
+        category_names = [cat["category_type"] for cat in categories]
+
+        weekly_budget = member.pocket_money / remaining_weeks
+
+        def escape_dots(text):
+            return str(text).replace(".", "\\.")
+
+        suggestions = [f"Consider spending around *{weekly_budget:.2f}* per week."]
+        if "Food" in category_names:
+            suggestions.append("🍽️ Prioritize meals over snacks to save more!")
+        if "Entertainment" in category_names:
+            suggestions.append(
+                "🎬 Keep entertainment spending within limits for a balanced budget."
+            )
+        if "Transport" in category_names:
+            suggestions.append("🚖 Use public transport or pooling to save costs.")
+
+        name = member.full_name
+        pockey_money_left = member.pocket_money
+
+        message = f"""
+            *📊 Weekly Spending Summary\\!*
+
+            Hey {name}, here’s your spending insight for the remaining {remaining_weeks} weeks:
+
+            🏦 *Pocket Money Left\\:* {pockey_money_left:.2f} INR  
+            📌 *Remaining Weeks\\:* {remaining_weeks}  
+            🔖 *Allowed Categories\\:* {', '.join(category_names)}
+
+            🔹 {suggestions[0]}
+            🔹 {suggestions[1] if len(suggestions) > 1 else ''}
+
+            _Plan wisely and make the most out of your budget\\!_
+        """
+
+        message = message.replace(":.2f", ":\\.2f") #escape the dot here.
+
+        print(message)
+
+        send_telegram_message(chat_id, message)
+
+
+def send_telegram_message(chat_id, message):
+
+    bot_token = os.getenv("BOT_TOKEN")
+
+    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+    payload = {"chat_id": chat_id, "text": message, "parse_mode": "MarkdownV2"}
+
+    try:
+        response = requests.post(url, json=payload)
+        response_data = response.json()
+        print(response_data)
+
+        if not response_data.get("ok"):
+            frappe.logger().error(f"Failed to send Telegram notification: {response_data}")
+    except Exception as e:
+        frappe.logger().error(f"Error sending Telegram message: {str(e)}")
+
+@frappe.whitelist(allow_guest=True)  
+def telegram_webhook():
+    try:
+        data = frappe.request.get_data(as_text=True)
+        data = json.loads(data)
+
+        if "message" in data:
+            chat_id = data["message"]["chat"]["id"]
+
+            if text == "/start":
+                send_telegram_message(chat_id, f"Hello you are now registered for updates")
+
+        return {"ok": True}
+    
+    except Exception as e:
+        frappe.log_error(f"Telegram Webhook Error: {str(e)}")
+        return {"ok": False, "error": str(e)}
+    
