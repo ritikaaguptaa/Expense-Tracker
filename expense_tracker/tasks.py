@@ -362,9 +362,10 @@ def telegram_webhook():
 
         if "message" in data:
             chat_id = data["message"]["chat"]["id"]
+            text = data["message"].get("text", "")
 
             if text == "/start":
-                send_telegram_message(chat_id, f"Hello you are now registered for updates")
+                send_telegram_message(chat_id, "Hello you are now registered for updates")
 
         return {"ok": True}
     
