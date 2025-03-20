@@ -158,9 +158,9 @@ scheduler_events = {
 # 	"hourly": [
 # 		"expense_tracker.tasks.hourly"
 # 	],
-# 	"weekly": [
-# 		"expense_tracker.tasks.weekly"
-# 	],
+	"weekly": [
+		"expense_tracker.tasks.weekly_spending_summary"
+	],
 	"monthly": [
 		"expense_tracker.tasks.monthly_pocket_money_scheduler"
 	],
