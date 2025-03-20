@@ -97,20 +97,6 @@ def monthly_pocket_money_scheduler():
 #         print(message)  # Debugging
 #         send_telegram_message(chat_id, message)
 
-def send_telegram_message(chat_id, message):
-    bot_token = os.getenv("BOT_TOKEN")
-    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-    payload = {"chat_id": chat_id, "text": message, "parse_mode": "MarkdownV2"}
-    
-    try:
-        response = requests.post(url, json=payload)
-        response_data = response.json()
-        print(response_data)  # Print the response
-        
-        if not response_data.get("ok"):
-            frappe.logger().error(f"Failed to send Telegram notification: {response_data}")
-    except Exception as e:
-        frappe.logger().error(f"Error sending Telegram message: {str(e)}")
 
 def get_audio_file_path():
     """Fetch the latest uploaded audio file path from File Doctype."""
