@@ -1,21 +1,20 @@
 import frappe
-# import datetime
 import os
 import requests
-# import asyncio
-# from deepgram import Deepgram
-# from dotenv import load_dotenv
-# import google.generativeai as genai
+import asyncio
+from deepgram import Deepgram
+from dotenv import load_dotenv
+import google.generativeai as genai
 import json
-# import re
-# import time
+import re
+import time
 
 # # Load environment variables
-# load_dotenv()
+load_dotenv()
 
-# DEEPGRAM_API_KEY = os.getenv("DEEPGRAM_API_KEY")
-# GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-# BOT_TOKEN = os.getenv("BOT_TOKEN")
+DEEPGRAM_API_KEY = os.getenv("DEEPGRAM_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 # def monthly_pocket_money_scheduler():
 #     family_members = frappe.get_all("Family Member", fields=["full_name", "telegram_id", "pocket_money", "rollover_savings", "primary_account_holder"])
@@ -98,180 +97,180 @@ import json
 #         send_telegram_message(chat_id, message)
 
 
-# def get_audio_file_path():
-#     """Fetch the latest uploaded audio file path from File Doctype."""
-#     file_doc = frappe.get_list("File", 
-#                                filters={"file_url": "/files/food.mp4"}, 
-#                                fields=["file_url"], 
-#                                limit=1)
+def get_audio_file_path():
+    """Fetch the latest uploaded audio file path from File Doctype."""
+    file_doc = frappe.get_list("File", 
+                               filters={"file_url": "/files/food.mp4"}, 
+                               fields=["file_url"], 
+                               limit=1)
 
-#     if file_doc:
-#         file_url = file_doc[0]["file_url"]  # "/files/food.mp4"
-#         site_path = frappe.get_site_path("public", file_url.lstrip("/"))  # Convert to absolute path
-#         return site_path
-#     return None
+    if file_doc:
+        file_url = file_doc[0]["file_url"]  # "/files/food.mp4"
+        site_path = frappe.get_site_path("public", file_url.lstrip("/"))  # Convert to absolute path
+        return site_path
+    return None
 
-# async def transcribe_audio_async():
-#     """Asynchronous function to transcribe audio using Deepgram API."""
-#     try:
-#         audio_path = get_audio_file_path()
-#         if not audio_path:
-#             print("No audio file found.")
-#             return None
+async def transcribe_audio_async():
+    """Asynchronous function to transcribe audio using Deepgram API."""
+    try:
+        audio_path = get_audio_file_path()
+        if not audio_path:
+            print("No audio file found.")
+            return None
 
-#         deepgram = Deepgram(DEEPGRAM_API_KEY)
+        deepgram = Deepgram(DEEPGRAM_API_KEY)
 
-#         with open(audio_path, "rb") as audio:
-#             buffer_data = audio.read()
+        with open(audio_path, "rb") as audio:
+            buffer_data = audio.read()
 
-#         options = {
-#             "punctuate": True,
-#             "model": "nova",
-#             "language": "en",
-#         }
+        options = {
+            "punctuate": True,
+            "model": "nova",
+            "language": "en",
+        }
 
-#         response = await deepgram.transcription.prerecorded(
-#             {"buffer": buffer_data, "mimetype": "audio/mp4"},
-#             options
-#         )
+        response = await deepgram.transcription.prerecorded(
+            {"buffer": buffer_data, "mimetype": "audio/mp4"},
+            options
+        )
 
-#         transcript = response["results"]["channels"][0]["alternatives"][0]["transcript"]
-#         # print("Transcription:", transcript)
+        transcript = response["results"]["channels"][0]["alternatives"][0]["transcript"]
+        # print("Transcription:", transcript)
 
-#         escaped_transcript = transcript.replace(".", "\\.").replace("!", "\\!")
+        escaped_transcript = transcript.replace(".", "\\.").replace("!", "\\!")
 
-#         message = """
-#         ⏳ *Processing...* 🎙️  
+        message = """
+        ⏳ *Processing...* 🎙️  
   
-# Hold tight! We're transcribing your audio...   
-#         """
+Hold tight! We're transcribing your audio...   
+        """
 
-#         message = message.replace(".", "\\.").replace("!", "\\!")
+        message = message.replace(".", "\\.").replace("!", "\\!")
 
-#         send_telegram_message("6155394022", message)
-#         time.sleep(2)
-#         message1 = """
-# Almost Done\!
-# """
-#         send_telegram_message("6155394022", message1) 
-#         time.sleep(4)
-#         extract_and_notify(transcript, escaped_transcript, "6155394022") 
-#         return transcript
+        send_telegram_message("6155394022", message)
+        time.sleep(2)
+        message1 = """
+Almost Done\!
+"""
+        send_telegram_message("6155394022", message1) 
+        time.sleep(4)
+        extract_and_notify(transcript, escaped_transcript, "6155394022") 
+        return transcript
 
-#     except Exception as e:
-#         print(f"Error in transcription: {e}")
-#         return None
+    except Exception as e:
+        print(f"Error in transcription: {e}")
+        return None
 
-# def extract_details_from_text(text):
-#     """Uses Gemini AI to extract structured details from text."""
-#     try:
-#         genai.configure(api_key=GEMINI_API_KEY)
+def extract_details_from_text(text):
+    """Uses Gemini AI to extract structured details from text."""
+    try:
+        genai.configure(api_key=GEMINI_API_KEY)
 
-#         prompt = f"""
-#         Extract structured details from the following text:
-#         "{text}"
+        prompt = f"""
+        Extract structured details from the following text:
+        "{text}"
 
-#         Output the details in **strict** JSON format with these keys:
-#         - amount (numeric, float)
-#         - category (string, like Food, Transport, etc.)
-#         - merchant (string, store or service name)
+        Output the details in **strict** JSON format with these keys:
+        - amount (numeric, float)
+        - category (string, like Food, Transport, etc.)
+        - merchant (string, store or service name)
 
-#         Example output (no additional text, just JSON):
-#         {{
-#             "amount": 120.50,
-#             "category": "Food",
-#             "merchant": "Dominos"
-#         }}
-#         """
+        Example output (no additional text, just JSON):
+        {{
+            "amount": 120.50,
+            "category": "Food",
+            "merchant": "Dominos"
+        }}
+        """
 
-#         model = genai.GenerativeModel("gemini-1.5-pro-latest")
-#         response = model.generate_content(prompt)
+        model = genai.GenerativeModel("gemini-1.5-pro-latest")
+        response = model.generate_content(prompt)
 
-#         # Ensure response is in JSON format
-#         extracted_data = response.text.strip()
+        # Ensure response is in JSON format
+        extracted_data = response.text.strip()
 
-#         # Debugging: Print the raw response
-#         print("Raw Gemini Response:", extracted_data)
+        # Debugging: Print the raw response
+        print("Raw Gemini Response:", extracted_data)
 
-#         # Remove backticks and unnecessary formatting
-#         cleaned_json = re.sub(r"```json|```", "", extracted_data).strip()
+        # Remove backticks and unnecessary formatting
+        cleaned_json = re.sub(r"```json|```", "", extracted_data).strip()
 
-#         # Try parsing JSON safely
-#         try:
-#             details = json.loads(cleaned_json)
-#         except json.JSONDecodeError:
-#             print("Error: Gemini response is not valid JSON")
-#             return None
+        # Try parsing JSON safely
+        try:
+            details = json.loads(cleaned_json)
+        except json.JSONDecodeError:
+            print("Error: Gemini response is not valid JSON")
+            return None
 
-#         print("Extracted Details:", details)
-#         return details
+        print("Extracted Details:", details)
+        return details
 
-#     except Exception as e:
-#         print(f"Error in extracting details: {e}")
-#         return None
+    except Exception as e:
+        print(f"Error in extracting details: {e}")
+        return None
 
     
-# def transcribe_audio():
-#     """Wrapper to run async function in sync mode using asyncio.run()"""
-#     return asyncio.run(transcribe_audio_async())
+def transcribe_audio():
+    """Wrapper to run async function in sync mode using asyncio.run()"""
+    return asyncio.run(transcribe_audio_async())
 
-# @frappe.whitelist(allow_guest=True)
-# def process_and_notify():
-#     """Transcribe audio and send it as a Telegram message."""
-#     return transcribe_audio()  
+@frappe.whitelist(allow_guest=True)
+def process_and_notify():
+    """Transcribe audio and send it as a Telegram message."""
+    return transcribe_audio()  
 
-# def escape_markdown_v2(text):
-#     """Escapes special characters for Telegram MarkdownV2."""
-#     if text is None:
-#         return "Unknown"  # Ensure None values are converted to safe text
+def escape_markdown_v2(text):
+    """Escapes special characters for Telegram MarkdownV2."""
+    if text is None:
+        return "Unknown"  # Ensure None values are converted to safe text
     
-#     escape_chars = r"_*[]()~`>#+-=|{}.!"
-#     return re.sub(r"([" + re.escape(escape_chars) + r"])", r"\\\1", str(text))  # Ensure conversion to string
+    escape_chars = r"_*[]()~`>#+-=|{}.!"
+    return re.sub(r"([" + re.escape(escape_chars) + r"])", r"\\\1", str(text))  # Ensure conversion to string
 
-# def extract_and_notify(text, escaped_transcript, chat_id):
-#     """Extract details from text and send as a Telegram notification."""
-#     extracted_details = extract_details_from_text(text)
+def extract_and_notify(text, escaped_transcript, chat_id):
+    """Extract details from text and send as a Telegram notification."""
+    extracted_details = extract_details_from_text(text)
     
-#     if extracted_details:
-#         # Ensure values are escaped properly
-#         amount = escape_markdown_v2(f"{extracted_details.get('amount', 'N/A'):.2f}")  # Force two decimal places for consistency
-#         category = escape_markdown_v2(extracted_details.get("category", "N/A"))
-#         merchant = escape_markdown_v2(extracted_details.get("merchant", "N/A"))  # Handle None safely
+    if extracted_details:
+        # Ensure values are escaped properly
+        amount = escape_markdown_v2(f"{extracted_details.get('amount', 'N/A'):.2f}")  # Force two decimal places for consistency
+        category = escape_markdown_v2(extracted_details.get("category", "N/A"))
+        merchant = escape_markdown_v2(extracted_details.get("merchant", "N/A"))  # Handle None safely
         
-#         message = f"""
-#     🎙️ *Transcription Complete\!*
+        message = f"""
+    🎙️ *Transcription Complete\!*
 
-# *{escaped_transcript}*
+*{escaped_transcript}*
 
-# 💡 *Expense Details Extracted* 💡
+💡 *Expense Details Extracted* 💡
 
-# 💰 *Amount:* {amount}  
-# 📂 *Category:* {category}  
-# 🏪 *Merchant:* {merchant}  
+💰 *Amount:* {amount}  
+📂 *Category:* {category}  
+🏪 *Merchant:* {merchant}  
 
-# ✅ *This record has been automatically saved in the Expense Doctype\!*
+✅ *This record has been automatically saved in the Expense Doctype\!*
 
-# 📊 _Effortless tracking for smarter spending\!_ 
-#         """
+📊 _Effortless tracking for smarter spending\!_ 
+        """
 
-#         send_telegram_message(chat_id, message)
+        send_telegram_message(chat_id, message)
 
-#         expense = frappe.get_doc({
-#             "doctype": "Expense",
-#             "user_id": chat_id,
-#             "amount": extracted_details.get("amount", 0.0),
-#             "category": category,
-#             "merchant": merchant,  # Handling None case
-#             "date": frappe.utils.now_datetime(),
-#             "description": text,
-#             "payment_mode": "Cash",
-#             "source": "Telegram Bot"
-#         })
+        expense = frappe.get_doc({
+            "doctype": "Expense",
+            "user_id": chat_id,
+            "amount": extracted_details.get("amount", 0.0),
+            "category": category,
+            "merchant": merchant,  # Handling None case
+            "date": frappe.utils.now_datetime(),
+            "description": text,
+            "payment_mode": "Cash",
+            "source": "Telegram Bot"
+        })
             
-#         expense.insert(ignore_permissions=True)
-#         frappe.db.commit()
-#     else:
-#         send_telegram_message(chat_id, "❌ Sorry, we couldn't extract the details from the text provided.")
+        expense.insert(ignore_permissions=True)
+        frappe.db.commit()
+    else:
+        send_telegram_message(chat_id, "❌ Sorry, we couldn't extract the details from the text provided.")
 
 # def weekly_spending_summary():
 
