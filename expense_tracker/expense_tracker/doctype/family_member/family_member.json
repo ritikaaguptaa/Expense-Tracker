@@ -15,10 +15,9 @@
  "fields": [
   {
    "fieldname": "primary_account_holder",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Primary Account Holder",
-   "options": "Primary Account",
    "reqd": 1
   },
   {
@@ -29,7 +28,6 @@
    "reqd": 1
   },
   {
-   "fetch_from": "primary_account_holder.default_pocket_money_for_dependents",
    "fieldname": "pocket_money",
    "fieldtype": "Currency",
    "in_list_view": 1,
@@ -69,7 +67,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-11 14:33:05.028234",
+ "modified": "2025-03-24 11:13:07.662476",
  "modified_by": "Administrator",
  "module": "Expense Tracker",
  "name": "Family Member",
