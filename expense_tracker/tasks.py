@@ -471,14 +471,19 @@ def telegram_webhook():
                     2️⃣ **If the message contains abusive or inappropriate language**, 
                     reply: "⚠️ Please maintain respectful communication. Let's keep this space friendly."
                     
-                    3️⃣ **If it's a general query**, provide a polite response explaining the bot’s features and how it can help.
+                    3️⃣ **If it's a general query**, reply in 2-3 lines, strictly explaining how the bot helps with tracking expenses.  
+                    Do not provide lengthy explanations, just a short and clear response.
                     """
 
                     genai.configure(api_key=GEMINI_API_KEY)
                     model = genai.GenerativeModel("gemini-1.5-pro-latest")
 
-                    ai_response = model.generate_content(prompt).text
-                    send_telegram_message(chat_id, ai_response)
+                    response = model.generate_content(prompt)
+
+                    ai_response = response.text if hasattr(response, "text") else "Sorry, I couldn't process your request."
+                    escaped_ai_response = ai_response.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
+
+                    send_telegram_message(chat_id, escaped_ai_response)
                 else:
                     parent_exists = frappe.db.exists("Primary Account", text)
 
