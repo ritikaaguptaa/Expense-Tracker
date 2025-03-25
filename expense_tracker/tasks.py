@@ -353,6 +353,27 @@ def send_telegram_message(chat_id, message):
     except Exception as e:
         frappe.logger().error(f"Error sending Telegram message: {str(e)}")
 
+def send_telegram_message_with_keyboard(chat_id, message, keyboard):
+    bot_token = os.getenv("BOT_TOKEN")
+
+    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+    payload = {
+        "chat_id": chat_id,
+        "text": message,
+        "parse_mode": "MarkdownV2",
+        "reply_markup": json.dumps({"inline_keyboard": keyboard}) 
+    }
+
+    try:
+        response = requests.post(url, json=payload)
+        response_data = response.json()
+        print(response_data)
+
+        if not response_data.get("ok"):
+            frappe.logger().error(f"Failed to send Telegram notification: {response_data}")
+    except Exception as e:
+        frappe.logger().error(f"Error sending Telegram message: {str(e)}")
+
 # @frappe.whitelist(allow_guest=True)  
 # def telegram_webhook():
 #     try:
@@ -418,7 +439,7 @@ def telegram_webhook():
                 }
 
                 escaped_message = welcome_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
-                send_telegram_message(chat_id, escaped_message, keyboard)
+                send_telegram_message_with_keyboard(chat_id, escaped_message, keyboard)
 
             elif "voice" in data["message"]:
                 voice_file_id = data["message"]["voice"]["file_id"]
