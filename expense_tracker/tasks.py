@@ -431,15 +431,16 @@ def telegram_webhook():
                     "👨‍👩‍👧‍👦 **Are you a Parent or a Dependent?**"
                 )
 
-                keyboard = {
-                    "inline_keyboard": [
-                        [{"text": "Parent", "callback_data": "role_parent"}],
-                        [{"text": "Dependent", "callback_data": "role_dependent"}]
-                    ]
-                }
+                # keyboard = {
+                #     "inline_keyboard": [
+                #         [{"text": "Parent", "callback_data": "role_parent"}],
+                #         [{"text": "Dependent", "callback_data": "role_dependent"}]
+                #     ]
+                # }
 
                 escaped_message = welcome_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
-                send_telegram_message_with_keyboard(chat_id, escaped_message, keyboard)
+                send_telegram_message(chat_id, escaped_message)
+                # send_telegram_message_with_keyboard(chat_id, escaped_message, keyboard)
 
             elif "voice" in data["message"]:
                 voice_file_id = data["message"]["voice"]["file_id"]
