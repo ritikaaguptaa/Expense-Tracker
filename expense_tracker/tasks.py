@@ -512,3 +512,15 @@ def telegram_webhook():
     except Exception as e:
         frappe.log_error(f"Telegram Webhook Error: {str(e)}")
         return {"ok": False, "error": str(e)}
+    
+def get_telegram_file_url(file_id):
+    bot_token = os.getenv("BOT_TOKEN")  
+    api_url = f"https://api.telegram.org/bot{bot_token}/getFile?file_id={file_id}"
+    
+    response = requests.get(api_url).json()
+    
+    if response.get("ok"):
+        file_path = response["result"]["file_path"]
+        return f"https://api.telegram.org/file/bot{bot_token}/{file_path}"
+    
+    return None
