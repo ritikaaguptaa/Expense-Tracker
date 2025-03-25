@@ -3,14 +3,14 @@ import os
 import requests
 import asyncio
 from deepgram import Deepgram
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import google.generativeai as genai
 import json
 import re
 import time
 
 # # Load environment variables
-load_dotenv()
+# load_dotenv()
 
 DEEPGRAM_API_KEY = os.getenv("DEEPGRAM_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
