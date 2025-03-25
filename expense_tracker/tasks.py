@@ -354,22 +354,161 @@ def send_telegram_message(chat_id, message):
     except Exception as e:
         frappe.logger().error(f"Error sending Telegram message: {str(e)}")
 
+# @frappe.whitelist(allow_guest=True)  
+# def telegram_webhook():
+#     try:
+#         data = frappe.request.get_data(as_text=True)
+#         data = json.loads(data)
+
+#         if "message" in data:
+#             chat_id = data["message"]["chat"]["id"]
+#             text = data["message"].get("text", "")
+
+#             if text == "/start":
+#                 send_telegram_message(chat_id, "Hello you are now registered for updates")
+
+#         return {"ok": True}
+    
+#     except Exception as e:
+#         frappe.log_error(f"Telegram Webhook Error: {str(e)}")
+#         return {"ok": False, "error": str(e)}
+
 @frappe.whitelist(allow_guest=True)  
 def telegram_webhook():
     try:
         data = frappe.request.get_data(as_text=True)
         data = json.loads(data)
 
+        if "callback_query" in data:
+            callback_query = data["callback_query"]
+            chat_id = callback_query["message"]["chat"]["id"]
+            callback_data = callback_query["data"]
+
+            frappe.cache().set_value(f"callback_{chat_id}", callback_data)
+
+            if callback_data == "role_parent":
+                message = "Please enter your **Parent ID** to continue."
+                escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
+                send_telegram_message(chat_id, escaped_message)
+
+            elif callback_data == "role_dependent":
+                message = "Please enter your **Parent ID** for verification."
+                escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
+                send_telegram_message(chat_id, escaped_message)
+
+            return {"ok": True}
+
         if "message" in data:
             chat_id = data["message"]["chat"]["id"]
+            first_name = data["message"]["from"].get("first_name", "User")
+            last_name = data["message"]["from"].get("last_name", "")
             text = data["message"].get("text", "")
 
             if text == "/start":
-                send_telegram_message(chat_id, "Hello you are now registered for updates")
+                welcome_message = (
+                    "👋 Welcome to **ExpenseTrackerBot**! 📊💰\n\n"
+                    "To get started, please select your role:\n\n"
+                    "👨‍👩‍👧‍👦 **Are you a Parent or a Dependent?**"
+                )
+
+                keyboard = {
+                    "inline_keyboard": [
+                        [{"text": "Parent", "callback_data": "role_parent"}],
+                        [{"text": "Dependent", "callback_data": "role_dependent"}]
+                    ]
+                }
+
+                escaped_message = welcome_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
+                send_telegram_message(chat_id, escaped_message, keyboard)
+
+            elif "voice" in data["message"]:
+                voice_file_id = data["message"]["voice"]["file_id"]
+                file_url = get_telegram_file_url(voice_file_id)
+
+                if file_url:
+                    file_doc = frappe.get_doc({
+                        "doctype": "File",
+                        "file_name": f"voice_{chat_id}.ogg",
+                        "file_url": file_url,
+                        "is_private": 1
+                    })
+                    file_doc.insert(ignore_permissions=True)
+
+                    process_and_notify(file_doc.file_url) # type: ignore
+
+            else:
+
+                user_role = frappe.cache().get_value(f"callback_{chat_id}")
+                
+                if user_role is None:
+                    prompt = f"""
+                    You are an AI assistant managing a Telegram Expense Tracker bot. 
+                    A user has sent the following message: "{text}"
+
+                    1️⃣ **If the message contains personal information** (like phone numbers, emails, addresses, etc.), 
+                    reply: "🚨 Please avoid sharing personal information. This bot is only for tracking expenses."
+                    
+                    2️⃣ **If the message contains abusive or inappropriate language**, 
+                    reply: "⚠️ Please maintain respectful communication. Let's keep this space friendly."
+                    
+                    3️⃣ **If it's a general query**, provide a polite response explaining the bot’s features and how it can help.
+                    """
+
+                    genai.configure(api_key=GEMINI_API_KEY)
+                    model = genai.GenerativeModel("gemini-1.5-pro-latest")
+
+                    ai_response = model.generate_content(prompt).text
+                    send_telegram_message(chat_id, ai_response)
+                else:
+                    parent_exists = frappe.db.exists("Primary Account", text)
+
+                    if not parent_exists:
+                        message = "❌ Invalid Parent ID. Please try again."
+                        escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
+                        send_telegram_message(chat_id, escaped_message)
+                        return {"ok": False, "error": "Invalid Parent ID"}
+                    
+                    if user_role == "role_parent":
+                        message = "🎉 **You are verified as a Parent!** Now, track your expenses daily! 💳"
+                        escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
+                        send_telegram_message(chat_id, escaped_message)
+                    
+                    else:  
+                        if frappe.db.exists("Family Member", {"telegram_id": chat_id}):
+                            message = "✅ **You're already registered!** Start tracking your expenses now. 📊"
+                            escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
+                            send_telegram_message(chat_id, escaped_message)
+                            return {"ok": True}
+                        
+                        main_user = frappe.get_doc("Primary Account", text)
+
+                        family_member_doc = frappe.get_doc({
+                            "doctype": "Family Member",
+                            "primary_account_holder": text,  
+                            "full_name": f"{first_name} {last_name}",  
+                            "pocket_money": main_user.default_pocket_money_for_dependents,   
+                            "telegram_id": chat_id
+                        })
+                        family_member_doc = frappe.get_doc({
+                            "doctype": "Family Member",
+                            "parent_id": text,
+                            "telegram_id": chat_id
+                        })
+                        family_member_doc.insert(ignore_permissions=True)
+
+                        main_user.salary -= main_user.default_pocket_money_for_dependents
+                        main_user.save(ignore_permissions=True)
+
+                        message = "🎉 **You are verified as a Dependent!** Now, track your expenses daily! 🏦"
+                        escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
+                        send_telegram_message(chat_id, escaped_message)
+
+                    frappe.cache().delete_value(f"callback_{chat_id}")
+
+                    return {"ok": True}
 
         return {"ok": True}
     
     except Exception as e:
         frappe.log_error(f"Telegram Webhook Error: {str(e)}")
         return {"ok": False, "error": str(e)}
-    
