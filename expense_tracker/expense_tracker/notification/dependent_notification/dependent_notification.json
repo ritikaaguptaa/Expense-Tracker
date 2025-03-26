@@ -1,0 +1,30 @@
+{
+ "attach_print": 0,
+ "channel": "Email",
+ "creation": "2025-03-26 10:14:45.520067",
+ "days_in_advance": 0,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Primary Account",
+ "enabled": 0,
+ "event": "Save",
+ "idx": 0,
+ "is_standard": 1,
+ "message": "<p>Add your message here</p>\n",
+ "message_type": "Markdown",
+ "modified": "2025-03-26 10:18:55.779229",
+ "modified_by": "Administrator",
+ "module": "Expense Tracker",
+ "name": "Dependent Notification",
+ "owner": "Administrator",
+ "recipients": [
+  {
+   "receiver_by_document_field": "email"
+  }
+ ],
+ "send_system_notification": 0,
+ "send_to_all_assignees": 0,
+ "sender": "Expense Tracker",
+ "sender_email": "expensesheet01@gmail.com",
+ "subject": "Hi"
+}
