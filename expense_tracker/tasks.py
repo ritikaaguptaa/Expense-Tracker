@@ -268,7 +268,7 @@ def extract_and_notify(text, escaped_transcript, chat_id):
             "merchant": merchant,  # Handling None case
             "date": frappe.utils.now_datetime(),
             "description": text,
-            "payment_mode": "Cash",
+            "payment_mode": "UPI",
             "source": "Telegram Bot"
         })
             
@@ -517,11 +517,6 @@ def telegram_webhook():
                             "primary_account_holder": text,  
                             "full_name": f"{first_name} {last_name}",  
                             "pocket_money": main_user.default_pocket_money_for_dependents,   
-                            "telegram_id": chat_id
-                        })
-                        family_member_doc = frappe.get_doc({
-                            "doctype": "Family Member",
-                            "parent_id": text,
                             "telegram_id": chat_id
                         })
                         family_member_doc.insert(ignore_permissions=True)
