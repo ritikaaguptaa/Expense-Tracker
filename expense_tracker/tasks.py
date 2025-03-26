@@ -110,28 +110,33 @@ def get_audio_file_path():
         return site_path
     return None
 
-async def transcribe_audio_async():
+async def transcribe_audio_async(file_url, chat_id):
     """Asynchronous function to transcribe audio using Deepgram API."""
     try:
-        audio_path = get_audio_file_path()
-        if not audio_path:
-            print("No audio file found.")
-            return None
+        # audio_path = frappe.get_site_path("public", file_url.lstrip("/"))
+        # if not audio_path:
+        #     print("No audio file found.")
+        #     return None
 
         deepgram = Deepgram(DEEPGRAM_API_KEY)
 
-        with open(audio_path, "rb") as audio:
-            buffer_data = audio.read()
+        # with open(audio_path, "rb") as audio:
+        #     buffer_data = audio.read()
 
-        options = {
-            "punctuate": True,
-            "model": "nova",
-            "language": "en",
-        }
+        # options = {
+        #     "punctuate": True,
+        #     "model": "nova",
+        #     "language": "en",
+        # }
+
+        # response = await deepgram.transcription.prerecorded(
+        #     {"buffer": buffer_data, "mimetype": "audio/ogg"},
+        #     options
+        # )
 
         response = await deepgram.transcription.prerecorded(
-            {"buffer": buffer_data, "mimetype": "audio/mp4"},
-            options
+            {"url": file_url},  # Use direct URL instead of reading the file
+            {"punctuate": True, "model": "nova", "language": "en"}
         )
 
         transcript = response["results"]["channels"][0]["alternatives"][0]["transcript"]
@@ -147,14 +152,14 @@ Hold tight! We're transcribing your audio...
 
         message = message.replace(".", "\\.").replace("!", "\\!")
 
-        send_telegram_message("6155394022", message)
-        time.sleep(2)
+        send_telegram_message(chat_id, message)
+        await asyncio.sleep(2)
         message1 = """
 Almost Done\!
 """
-        send_telegram_message("6155394022", message1) 
+        send_telegram_message(chat_id, message1) 
         time.sleep(4)
-        extract_and_notify(transcript, escaped_transcript, "6155394022") 
+        extract_and_notify(transcript, escaped_transcript, chat_id) 
         return transcript
 
     except Exception as e:
@@ -210,14 +215,14 @@ def extract_details_from_text(text):
         return None
 
     
-def transcribe_audio():
+def transcribe_audio(file_url, chat_id):
     """Wrapper to run async function in sync mode using asyncio.run()"""
-    return asyncio.run(transcribe_audio_async())
+    return asyncio.run(transcribe_audio_async(file_url, chat_id))
 
 @frappe.whitelist(allow_guest=True)
-def process_and_notify():
+def process_and_notify(file_url, chat_id):
     """Transcribe audio and send it as a Telegram message."""
-    return transcribe_audio()  
+    return transcribe_audio(file_url, chat_id)  
 
 def escape_markdown_v2(text):
     """Escapes special characters for Telegram MarkdownV2."""
@@ -454,7 +459,7 @@ def telegram_webhook():
                     })
                     file_doc.insert(ignore_permissions=True)
 
-                    process_and_notify(file_doc.file_url) # type: ignore
+                    process_and_notify(file_url, chat_id) # type: ignore
 
             else:
 
