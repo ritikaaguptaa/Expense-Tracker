@@ -404,7 +404,7 @@ def telegram_webhook():
             chat_id = callback_query["message"]["chat"]["id"]
             callback_data = callback_query["data"]
 
-            frappe.cache().set_value(f"callback_{chat_id}", callback_data)
+            frappe.cache.set_value(f"callback_{chat_id}", callback_data)
 
             if callback_data == "role_parent":
                 message = "Please enter your **Parent ID** to continue."
@@ -458,7 +458,7 @@ def telegram_webhook():
 
             else:
 
-                user_role = frappe.cache().get_value(f"callback_{chat_id}")
+                user_role = frappe.cache.get_value(f"callback_{chat_id}")
                 
                 if user_role is None:
                     prompt = f"""
