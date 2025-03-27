@@ -15,6 +15,7 @@ def send_email_to_dependent(email, name, primary_name, primary_id):
 <p>Dear {name},</p>
 <p>Exciting news! <b>{primary_name}</b> has added you as a dependent.</p>
 <p><b>Parent ID:</b> {primary_id}</p>
+<p><b>Important:</b> Please do not share your Parent ID with anyone. You will be required to enter it after starting the bot.</p>
 <p>Start managing your expenses with ease.</p>
 <p>Click the link below and send the <b>/start</b> command to begin:</p>
 <br>
