@@ -97,19 +97,6 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 #         send_telegram_message(chat_id, message)
 
 
-def get_audio_file_path():
-    """Fetch the latest uploaded audio file path from File Doctype."""
-    file_doc = frappe.get_list("File", 
-                               filters={"file_url": "/files/food.mp4"}, 
-                               fields=["file_url"], 
-                               limit=1)
-
-    if file_doc:
-        file_url = file_doc[0]["file_url"]  # "/files/food.mp4"
-        site_path = frappe.get_site_path("public", file_url.lstrip("/"))  # Convert to absolute path
-        return site_path
-    return None
-
 async def transcribe_audio_async(file_url, chat_id):
     """Asynchronous function to transcribe audio using Deepgram API."""
     try:
@@ -273,7 +260,7 @@ def extract_and_notify(text, escaped_transcript, chat_id):
         })
             
         expense.insert(ignore_permissions=True)
-        frappe.db.commit()
+        # frappe.db.commit()
     else:
         send_telegram_message(chat_id, "❌ Sorry, we couldn't extract the details from the text provided.")
 
@@ -412,12 +399,12 @@ def telegram_webhook():
             frappe.cache.set_value(f"callback_{chat_id}", callback_data)
 
             if callback_data == "role_parent":
-                message = "Please enter your **Parent ID** to continue."
+                message = "Please enter your *Parent ID* to continue."
                 escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
                 send_telegram_message(chat_id, escaped_message)
 
             elif callback_data == "role_dependent":
-                message = "Please enter your **Parent ID** for verification."
+                message = "Please enter your *Parent ID* for verification."
                 escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
                 send_telegram_message(chat_id, escaped_message)
 
@@ -431,9 +418,9 @@ def telegram_webhook():
 
             if text == "/start":
                 welcome_message = (
-                    "👋 Welcome to **ExpenseTrackerBot**! 📊💰\n\n"
+                    "👋 Welcome to *ExpenseTrackerBot*! 📊💰\n\n"
                     "To get started, please select your role:\n\n"
-                    "👨‍👩‍👧‍👦 **Are you a Parent or a Dependent?**"
+                    "👨‍👩‍👧‍👦 *Are you a Parent or a Dependent?*"
                 )
 
                 keyboard = [
@@ -470,13 +457,13 @@ def telegram_webhook():
                     You are an AI assistant managing a Telegram Expense Tracker bot. 
                     A user has sent the following message: "{text}"
 
-                    1️⃣ **If the message contains personal information** (like phone numbers, emails, addresses, etc.), 
+                    1️⃣ *If the message contains personal information* (like phone numbers, emails, addresses, etc.), 
                     reply: "🚨 Please avoid sharing personal information. This bot is only for tracking expenses."
                     
-                    2️⃣ **If the message contains abusive or inappropriate language**, 
+                    2️⃣ *If the message contains abusive or inappropriate language*, 
                     reply: "⚠️ Please maintain respectful communication. Let's keep this space friendly."
                     
-                    3️⃣ **If it's a general query**, reply in 2-3 lines, strictly explaining how the bot helps with tracking expenses.  
+                    3️⃣ *If it's a general query*, reply in 2-3 lines, strictly explaining how the bot helps with tracking expenses.  
                     Do not provide lengthy explanations, just a short and clear response.
                     """
 
@@ -499,13 +486,13 @@ def telegram_webhook():
                         return {"ok": False, "error": "Invalid Parent ID"}
                     
                     if user_role == "role_parent":
-                        message = "🎉 **You are verified as a Parent!** Now, track your expenses daily! 💳"
+                        message = "🎉 *You are verified as a Parent!* Now, track your expenses daily! 💳"
                         escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
                         send_telegram_message(chat_id, escaped_message)
                     
                     else:  
                         if frappe.db.exists("Family Member", {"telegram_id": chat_id}):
-                            message = "✅ **You're already registered!** Start tracking your expenses now. 📊"
+                            message = "✅ *You're already registered!* Start tracking your expenses now. 📊"
                             escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
                             send_telegram_message(chat_id, escaped_message)
                             return {"ok": True}
@@ -524,7 +511,7 @@ def telegram_webhook():
                         main_user.salary -= main_user.default_pocket_money_for_dependents
                         main_user.save(ignore_permissions=True)
 
-                        message = "🎉 **You are verified as a Dependent!** Now, track your expenses daily! 🏦"
+                        message = "🎉 *You are verified as a Dependent!* Now, track your expenses daily! 🏦"
                         escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
                         send_telegram_message(chat_id, escaped_message)
 
