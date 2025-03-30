@@ -310,7 +310,7 @@ def extract_and_notify(text, escaped_transcript, chat_id):
         else:
             primary_account_doc = frappe.get_doc(
                 "Primary Account", {"telegram_id": chat_id}
-            )
+            )   
 
             allowed_categories = [
                 d.category_type

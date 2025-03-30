@@ -1,7 +1,6 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "format:TRACK-{YYYY}-{#####}",
  "creation": "2025-03-10 10:03:03.716605",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -42,8 +41,7 @@
    "fieldname": "telegram_id",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Telegram ID",
-   "read_only": 1
+   "label": "Telegram ID"
   },
   {
    "fieldname": "total_expense",
@@ -62,11 +60,10 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-26 16:31:26.590629",
+ "modified": "2025-03-31 00:59:04.811287",
  "modified_by": "Administrator",
  "module": "Expense Tracker",
  "name": "Primary Account",
- "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
