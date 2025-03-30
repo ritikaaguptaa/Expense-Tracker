@@ -739,6 +739,22 @@ def approve_money_request(parent_chat_id):
     frappe.cache.delete_value(f"request_parent_{parent_chat_id}")
     return {"ok": True}
 
+def deny_money_request(parent_chat_id):
+    dependent_chat_id = frappe.cache.get_value(f"request_parent_{parent_chat_id}")
+
+    parent_message = "❌ *Request Denied!* You rejected the money request."
+    dependent_message = "❌ *Request Denied!* Your parent rejected your request for money."
+
+    parent_escaped_message = parent_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
+    dependent_escaped_message = dependent_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
+
+    send_telegram_message(parent_chat_id, parent_escaped_message)
+    send_telegram_message(dependent_chat_id, dependent_escaped_message)
+        
+    frappe.cache.delete_value(f"request_amount_{parent_chat_id}")
+    frappe.cache.delete_value(f"request_parent_{parent_chat_id}")
+    return {"ok": True}
+
 def get_telegram_file_url(file_id):
     bot_token = os.getenv("BOT_TOKEN")  
     api_url = f"https://api.telegram.org/bot{bot_token}/getFile?file_id={file_id}"
