@@ -586,16 +586,6 @@ def telegram_webhook():
                 .replace("_", "\\_")
             )
             send_telegram_message(chat_id, escaped_message)
-
-                message = "Please enter your *Parent ID* to continue."
-                escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
-                send_telegram_message(chat_id, escaped_message)
-
-            elif callback_data == "role_dependent":
-                message = "Please enter your *Parent ID* for verification."
-                escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
-                send_telegram_message(chat_id, escaped_message)
-
             return {"ok": True}
 
         if "message" in data:
@@ -726,7 +716,7 @@ def telegram_webhook():
                         escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
                         send_telegram_message(chat_id, escaped_message)
                     
-                    else:  
+                    elif user_role == "role_dependent":  
                         if frappe.db.exists("Family Member", {"telegram_id": chat_id}):
                             message = "✅ *You're already registered!* Start tracking your expenses now. 📊"
                             escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
