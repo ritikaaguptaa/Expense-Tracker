@@ -690,6 +690,17 @@ def telegram_webhook():
         frappe.log_error(f"Telegram Webhook Error: {str(e)}")
         return {"ok": False, "error": str(e)}
 
+def get_balance(chat_id):
+    primary_account_salary = frappe.db.get_value("Primary Account", {"telegram_id": chat_id}, "salary")
+    family_member_pockey_money = frappe.db.get_value("Family Member", {"telegram_id": chat_id}, "pocket_money")
+
+    if primary_account_salary:
+        return f"💰 *Your Current Balance:* ₹{primary_account_salary}"
+    elif family_member_pockey_money:
+        return f"🛍️ *Your Current Pocket Money Balance:* ₹{family_member_pockey_money}"
+    else:
+        return "⚠️ *You are not registered in our system.*"
+
 def get_telegram_file_url(file_id):
     bot_token = os.getenv("BOT_TOKEN")  
     api_url = f"https://api.telegram.org/bot{bot_token}/getFile?file_id={file_id}"
