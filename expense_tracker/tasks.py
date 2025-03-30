@@ -701,6 +701,44 @@ def get_balance(chat_id):
     else:
         return "⚠️ *You are not registered in our system.*"
 
+def approve_money_request(parent_chat_id):
+    amount = frappe.cache.get_value(f"request_amount_{parent_chat_id}")
+    dependent_chat_id = frappe.cache.get_value(f"request_parent_{parent_chat_id}")
+
+    amount = int(amount)
+
+    primary_account_doc = frappe.get_doc("Primary Account", {"telegram_id": parent_chat_id})
+    family_member_doc = frappe.get_doc("Family Member", {"telegram_id": dependent_chat_id})
+
+    if primary_account_doc.salary >= amount:
+        primary_account_doc.salary -= amount
+        family_member_doc.pocket_money += amount
+
+        primary_account_doc.save(ignore_permissions=True)
+        family_member_doc.save(ignore_permissions=True)
+
+        parent_message = f"✅ *Request Approved!*\n₹{amount} has been transferred to {family_member_doc.full_name}."
+        dependent_message = f"🎉 *Request Approved!*\nYour parent sent you ₹{amount}. Check your pocket money! 💰"
+
+        parent_escaped_message = parent_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
+        dependent_escaped_message = dependent_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
+
+        keyboard = {
+            "inline_keyboard": [
+                [{"text": "💰 Check Balance", "callback_data": "check_balance"}]
+            ]
+        }
+
+        send_telegram_message(parent_chat_id, parent_escaped_message, reply_markup=keyboard)
+        send_telegram_message(dependent_chat_id, dependent_escaped_message, reply_markup=keyboard)
+    else:
+        send_telegram_message(parent_chat_id, "❌ *Insufficient balance!* You don’t have enough funds to approve this request.")
+        send_telegram_message(dependent_chat_id, "❌ *Request Denied!* Your parent does not have enough funds.")
+
+    frappe.cache.delete_value(f"request_amount_{parent_chat_id}")
+    frappe.cache.delete_value(f"request_parent_{parent_chat_id}")
+    return {"ok": True}
+
 def get_telegram_file_url(file_id):
     bot_token = os.getenv("BOT_TOKEN")  
     api_url = f"https://api.telegram.org/bot{bot_token}/getFile?file_id={file_id}"
