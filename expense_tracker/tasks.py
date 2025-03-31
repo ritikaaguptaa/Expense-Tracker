@@ -320,7 +320,7 @@ def extract_and_notify(text, escaped_transcript, chat_id):
                                 "category_type": category,
                             },
                         )
-                        expense_category_type_doc.budget -= extracted_details.get("amount", 0.0)
+                        expense_category_type_doc.budget -= float(extracted_details.get("amount", 0.0))
                         expense_category_type_doc.save(ignore_permissions=True)
                         frappe.db.commit()
                 except Exception as e:
@@ -358,13 +358,12 @@ def extract_and_notify(text, escaped_transcript, chat_id):
                 keyboard.append([{ "text": "🛎️ Request Money", "callback_data": "request_money"}])
 
             message = f"""
-🎙️ *Transcription Complete\!*\n\n*{escaped_transcript}*\n\n💡 
-*Expense Details Extracted* 💡\n\n💰 
-
-*Amount:* {amount}  \n📂 
-*Category:* {category}  \n🏪 
-*Merchant:* {merchant}  \n\n✅ 
-*This record has been automatically saved in the Expense Doctype\!*\n\n
+🎙️ *Transcription Complete\!*\n\n*{escaped_transcript}*\n\n
+💡 *Expense Details Extracted* 💡\n\n
+💰 *Amount:* {amount}  \n
+📂 *Category:* {category}  \n
+🏪 *Merchant:* {merchant}  \n\n
+✅ *This record has been automatically saved in the Expense Doctype\!*\n\n
 📊 _Effortless tracking for smarter spending\!_ \n            
 
 """
@@ -682,42 +681,10 @@ def telegram_webhook():
                                 .replace("*", "\\*")
                                 .replace("_", "\\_")
                             )
-                    if not parent_exists:
-                        message = "❌ Invalid Parent ID. Please try again."
-                        escaped_message = (
-                            message.replace(".", "\\.")
-                            .replace("!", "\\!")
-                            .replace("*", "\\*")
-                            .replace("_", "\\_")
-                        )
-                        send_telegram_message(chat_id, escaped_message)
-                        return {"ok": False, "error": "Invalid Parent ID"}
-
-                    if user_role == "role_parent":
-                        message = "🎉 *You are verified as a Parent!* Now, track your expenses daily! 💳"
-                        escaped_message = (
-                            message.replace(".", "\\.")
-                            .replace("!", "\\!")
-                            .replace("*", "\\*")
-                            .replace("_", "\\_")
-                        )
-                        send_telegram_message(chat_id, escaped_message)
-
-                    elif user_role == "role_dependent":
-                        if frappe.db.exists("Family Member", {"telegram_id": chat_id}):
-                            message = "✅ *You're already registered!* Start tracking your expenses now. 📊"
-                            escaped_message = (
-                                message.replace(".", "\\.")
-                                .replace("!", "\\!")
-                                .replace("*", "\\*")
-                                .replace("_", "\\_")
-                            )
                             send_telegram_message(chat_id, escaped_message)
 
-                        else:
-                            if frappe.db.exists(
-                                "Family Member", {"telegram_id": chat_id}
-                            ):
+                        elif user_role == "role_dependent":
+                            if frappe.db.exists("Family Member", {"telegram_id": chat_id}):
                                 message = "✅ *You're already registered!* Start tracking your expenses now. 📊"
                                 escaped_message = (
                                     message.replace(".", "\\.")
@@ -726,35 +693,46 @@ def telegram_webhook():
                                     .replace("_", "\\_")
                                 )
                                 send_telegram_message(chat_id, escaped_message)
-                                return {"ok": True}
 
-                            main_user = frappe.get_doc("Primary Account", text)
+                            else:
+                                if frappe.db.exists("Family Member", {"telegram_id": chat_id}):
+                                    message = "✅ *You're already registered!* Start tracking your expenses now. 📊"
+                                    escaped_message = (
+                                        message.replace(".", "\\.")
+                                        .replace("!", "\\!")
+                                        .replace("*", "\\*")
+                                        .replace("_", "\\_")
+                                    )
+                                    send_telegram_message(chat_id, escaped_message)
+                                    return {"ok": True}
 
-                            family_member_doc = frappe.get_doc(
-                                {
-                                    "doctype": "Family Member",
-                                    "primary_account_holder": text,
-                                    "full_name": f"{first_name} {last_name}",
-                                    "pocket_money": main_user.default_pocket_money_for_dependents,
-                                    "telegram_id": chat_id,
-                                }
-                            )
-                            family_member_doc.insert(ignore_permissions=True)
+                                main_user = frappe.get_doc("Primary Account", text)
 
-                            main_user.salary -= (
-                                main_user.default_pocket_money_for_dependents
-                            )
-                            main_user.save(ignore_permissions=True)
-                            frappe.db.commit()
+                                family_member_doc = frappe.get_doc(
+                                    {
+                                        "doctype": "Family Member",
+                                        "primary_account_holder": text,
+                                        "full_name": f"{first_name} {last_name}",
+                                        "pocket_money": main_user.default_pocket_money_for_dependents,
+                                        "telegram_id": chat_id,
+                                    }
+                                )
+                                family_member_doc.insert(ignore_permissions=True)
 
-                            message = "🎉 *You are verified as a Dependent!* Now, track your expenses daily! 🏦"
-                            escaped_message = (
-                                message.replace(".", "\\.")
-                                .replace("!", "\\!")
-                                .replace("*", "\\*")
-                                .replace("_", "\\_")
-                            )
-                            send_telegram_message(chat_id, escaped_message)
+                                main_user.salary -= (
+                                    main_user.default_pocket_money_for_dependents
+                                )
+                                main_user.save(ignore_permissions=True)
+                                frappe.db.commit()
+
+                                message = "🎉 *You are verified as a Dependent!* Now, track your expenses daily! 🏦"
+                                escaped_message = (
+                                    message.replace(".", "\\.")
+                                    .replace("!", "\\!")
+                                    .replace("*", "\\*")
+                                    .replace("_", "\\_")
+                                )
+                                send_telegram_message(chat_id, escaped_message)
 
                     elif user_role == "add_money":
                         message = ""  
@@ -791,9 +769,7 @@ def telegram_webhook():
                                 return {"ok": False, "error": "Family Member not found"}
 
                             try:
-                                primary_account_doc = frappe.get_doc(
-                                    "Primary Account", {"name": family_member_doc.primary_account_holder}
-                                )
+                                primary_account_doc = frappe.get_doc("Primary Account", family_member_doc.primary_account_holder)
                             except frappe.DoesNotExistError:
                                 warning_message = "❌ *Error:* Your parent account does not exist."
                                 escaped_message = warning_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
@@ -806,7 +782,6 @@ def telegram_webhook():
                                 send_telegram_message(chat_id, escaped_message)
                                 return {"ok": False, "error": "Parent Telegram ID missing"}
 
-                            # Store request details in cache
                             frappe.cache.set_value(f"request_amount_{primary_account_doc.telegram_id}", amount)
                             frappe.cache.set_value(f"request_parent_{primary_account_doc.telegram_id}", chat_id)
 
