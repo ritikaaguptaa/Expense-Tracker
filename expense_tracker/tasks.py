@@ -240,174 +240,153 @@ def escape_markdown_v2(text):
     )  # Ensure conversion to string
 
 
+import frappe
+
 def extract_and_notify(text, escaped_transcript, chat_id):
     """Extract details from text and send as a Telegram notification."""
-    extracted_details = extract_details_from_text(text)
+    try:
+        extracted_details = extract_details_from_text(text)
+        if extracted_details:
+            amount = escape_markdown_v2(f"{extracted_details.get('amount', 'N/A'):.2f}")
+            category = escape_markdown_v2(extracted_details.get("category", "N/A"))
+            merchant = escape_markdown_v2(extracted_details.get("merchant", "N/A"))
 
-    if extracted_details:
-        amount = escape_markdown_v2(f"{extracted_details.get('amount', 'N/A'):.2f}")
-        category = escape_markdown_v2(extracted_details.get("category", "N/A"))
-        merchant = escape_markdown_v2(
-            extracted_details.get("merchant", "N/A")
-        )  # Handle None safely
+            is_primary = frappe.db.exists("Primary Account", {"telegram_id": chat_id})
+            is_family = frappe.db.exists("Family Member", {"telegram_id": chat_id})
 
-        is_primary = frappe.db.exists("Primary Account", {"telegram_id": chat_id})
-        is_family = frappe.db.exists("Family Member", {"telegram_id": chat_id})
+            frappe.logger().info(f"Extracted Details: {extracted_details}, Chat ID: {chat_id}, Is Primary: {is_primary}, Is Family: {is_family}")
 
-        if is_family:
-            family_member_doc = frappe.get_doc(
-                "Family Member", {"telegram_id": chat_id}
-            )
-            primary_account_holder_id = family_member_doc.primary_account_holder
+            if is_family:
+                try:
+                    family_member_doc = frappe.get_doc("Family Member", {"telegram_id": chat_id})
+                    primary_account_holder_id = family_member_doc.primary_account_holder
 
-            allowed_categories = [
-                d.category_type
-                for d in frappe.get_all(
-                    "Expense Category",
-                    filters={"associated_account_holder": primary_account_holder_id},
-                    fields=["category_type"],
-                )
+                    allowed_categories = [
+                        d.category_type
+                        for d in frappe.get_all(
+                            "Expense Category",
+                            filters={"associated_account_holder": primary_account_holder_id},
+                            fields=["category_type"],
+                        )
+                    ]
+
+                    if category not in allowed_categories:
+                        primary_account_doc = frappe.get_doc("Primary Account", {"name": primary_account_holder_id})
+                        family_message = f"⚠️ *Restricted Category!* Your transaction under '{category}' is not permitted."
+                        parent_message = f"📢 *Expense Alert!* {family_member_doc.full_name} attempted a transaction in the '{category}' category, which is not part of the permitted expenses."
+
+                        family_escaped_message = family_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
+                        parent_escaped_message = parent_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
+
+                        send_telegram_message(chat_id, family_escaped_message)
+                        send_telegram_message(primary_account_doc.telegram_id, parent_escaped_message)
+                        return
+                    else:
+                        expense_category_type_doc = frappe.get_doc(
+                            "Expense Category",
+                            filters={
+                                "associated_account_holder": primary_account_holder_id,
+                                "category_type": category,
+                            },
+                        )
+                        expense_category_type_doc.budget -= amount
+                        expense_category_type_doc.save(ignore_permissions=True)
+                except Exception as e:
+                    frappe.log_error(f"Error processing family member transaction: {str(e)}")
+
+            else:
+                try:
+                    primary_account_doc = frappe.get_doc("Primary Account", {"telegram_id": chat_id})
+                    allowed_categories = [
+                        d.category_type
+                        for d in frappe.get_all(
+                            "Expense Category",
+                            filters={"associated_account_holder": primary_account_doc.name},
+                            fields=["category_type"],
+                        )
+                    ]
+
+                    if category not in allowed_categories:
+                        warning_message = f"⚠️ *Unrecognized Category!* The category '{category}' is not listed under your approved expense categories."
+                        escaped_message = warning_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
+                        send_telegram_message(chat_id, escaped_message)
+                        return
+                    else:
+                        expense_category_type_doc = frappe.get_doc(
+                            "Expense Category",
+                            filters={
+                                "associated_account_holder": primary_account_doc.name,
+                                "category_type": category,
+                            },
+                        )
+                        expense_category_type_doc.budget -= amount
+                        expense_category_type_doc.save(ignore_permissions=True)
+                except Exception as e:
+                    frappe.log_error(f"Error processing primary account transaction: {str(e)}")
+
+            if is_primary:
+                try:
+                    primary_account = frappe.get_doc("Primary Account", {"telegram_id": chat_id})
+                    primary_account.salary -= amount
+                    primary_account.save(ignore_permissions=True)
+                except Exception as e:
+                    frappe.log_error(f"Error updating primary account balance: {str(e)}")
+            elif is_family:
+                try:
+                    family_member = frappe.get_doc("Family Member", {"telegram_id": chat_id})
+                    if family_member.pocket_money >= amount:
+                        family_member.pocket_money -= amount
+                        family_member.save(ignore_permissions=True)
+                    else:
+                        send_telegram_message(chat_id, "⚠️ *Insufficient pocket money!* Please request more funds.")
+                        return
+                except Exception as e:
+                    frappe.log_error(f"Error updating family member pocket money: {str(e)}")
+
+            keyboard = [
+                [{"text": "💰 Check Balance", "callback_data": "check_balance"}],
+                [{"text": "📊 View Report", "callback_data": "view_report"}],
             ]
 
-            if category not in allowed_categories:
-                primary_account_doc = frappe.get_doc(
-                    "Family Member", {"name": primary_account_holder_id}
-                )
+            if is_primary:
+                keyboard.append([{ "text": "➕ Add Money", "callback_data": "add_money"}])
+            elif is_family:
+                keyboard.append([{ "text": "🛎️ Request Money", "callback_data": "request_money"}])
 
-                family_message = f"⚠️ *Restricted Category!* Your transaction under '{category}' is not permitted."
-                parent_message = f"📢 *Expense Alert!* {family_member_doc.full_name} attempted a transaction in the '{category}' category, which is not part of the permitted expenses."
+            message = f"""
+🎙️ *Transcription Complete\!*\n\n*{escaped_transcript}*\n\n💡 
+*Expense Details Extracted* 💡\n\n💰 
 
-                family_escaped_message = (
-                    family_message.replace(".", "\\.")
-                    .replace("!", "\\!")
-                    .replace("*", "\\*")
-                    .replace("_", "\\_")
-                )
-                parent_escaped_message = (
-                    parent_message.replace(".", "\\.")
-                    .replace("!", "\\!")
-                    .replace("*", "\\*")
-                    .replace("_", "\\_")
-                )
+*Amount:* {amount}  \n📂 
+*Category:* {category}  \n🏪 
+*Merchant:* {merchant}  \n\n✅ 
+*This record has been automatically saved in the Expense Doctype\!*\n\n
+📊 _Effortless tracking for smarter spending\!_ \n            
 
-                send_telegram_message(chat_id, family_escaped_message)
-                send_telegram_message(
-                    primary_account_doc.telegram_id, parent_escaped_message
+"""
+
+            try:
+                expense = frappe.get_doc(
+                    {
+                        "doctype": "Expense",
+                        "user_id": chat_id,
+                        "amount": extracted_details.get("amount", 0.0),
+                        "category": category,
+                        "merchant": merchant,
+                        "date": frappe.utils.now_datetime(),
+                        "description": text,
+                        "payment_mode": "UPI",
+                        "source": "Telegram Bot",
+                    }
                 )
-                return
-            else:
-                expense_category_type_doc = frappe.get_doc(
-                    "Expense Category",
-                    filters={
-                        "associated_account_holder": primary_account_holder_id,
-                        "category_type": category,
-                    },
-                )
-                expense_category_type_doc.budget -= amount
-                expense_category_type_doc.save(ignore_permissions=True)
+                expense.insert(ignore_permissions=True)
+                send_telegram_message_with_keyboard(chat_id, message, keyboard)
+            except Exception as e:
+                frappe.log_error(f"Error inserting expense record: {str(e)}")
         else:
-            primary_account_doc = frappe.get_doc(
-                "Primary Account", {"telegram_id": chat_id}
-            )
-
-            allowed_categories = [
-                d.category_type
-                for d in frappe.get_all(
-                    "Expense Category",
-                    filters={"associated_account_holder": primary_account_doc.name},
-                    fields=["category_type"],
-                )
-            ]
-
-            if category not in allowed_categories:
-                warning_message = f"⚠️ *Unrecognized Category!* The category '{category}' is not listed under your approved expense categories."
-                escaped_message = (
-                    warning_message.replace(".", "\\.")
-                    .replace("!", "\\!")
-                    .replace("*", "\\*")
-                    .replace("_", "\\_")
-                )
-                send_telegram_message(chat_id, escaped_message)
-                return
-            else:
-                expense_category_type_doc = frappe.get_doc(
-                    "Expense Category",
-                    filters={
-                        "associated_account_holder": primary_account_doc.name,
-                        "category_type": category,
-                    },
-                )
-                expense_category_type_doc.budget -= amount
-                expense_category_type_doc.save(ignore_permissions=True)
-
-        if is_primary:
-            primary_account = frappe.get_doc(
-                "Primary Account", {"telegram_id": chat_id}
-            )
-            primary_account.salary -= amount
-            primary_account.save(ignore_permissions=True)
-
-        elif is_family:
-            family_member = frappe.get_doc("Family Member", {"telegram_id": chat_id})
-            if family_member.pocket_money >= amount:
-                family_member.pocket_money -= amount
-                family_member.save(ignore_permissions=True)
-            else:
-                send_telegram_message(
-                    chat_id, "⚠️ *Insufficient pocket money!* Please request more funds."
-                )
-                return
-
-        keyboard = [
-            [{"text": "💰 Check Balance", "callback_data": "check_balance"}],
-            [{"text": "📊 View Report", "callback_data": "view_report"}],
-        ]
-
-        if is_primary:
-            keyboard.append([{"text": "➕ Add Money", "callback_data": "add_money"}])
-        elif is_family:
-            keyboard.append(
-                [{"text": "🛎️ Request Money", "callback_data": "request_money"}]
-            )
-
-        message = f"""
-    🎙️ *Transcription Complete\!*
-
-*{escaped_transcript}*
-
-💡 *Expense Details Extracted* 💡
-
-💰 *Amount:* {amount}  
-📂 *Category:* {category}  
-🏪 *Merchant:* {merchant}  
-
-✅ *This record has been automatically saved in the Expense Doctype\!*
-
-📊 _Effortless tracking for smarter spending\!_ 
-        """
-
-        expense = frappe.get_doc(
-            {
-                "doctype": "Expense",
-                "user_id": chat_id,
-                "amount": extracted_details.get("amount", 0.0),
-                "category": category,
-                "merchant": merchant,  # Handling None case
-                "date": frappe.utils.now_datetime(),
-                "description": text,
-                "payment_mode": "UPI",
-                "source": "Telegram Bot",
-            }
-        )
-
-        expense.insert(ignore_permissions=True)
-        send_telegram_message_with_keyboard(chat_id, message, keyboard)
-        # frappe.db.commit()
-    else:
-        send_telegram_message(
-            chat_id, "❌ Sorry, we couldn't extract the details from the text provided\."
-        )
-
+            send_telegram_message(chat_id, "❌ Sorry, we couldn't extract the details from the text provided\.")
+    except Exception as e:
+        frappe.log_error(f"Unexpected error in extract_and_notify: {str(e)}")
 
 # def weekly_spending_summary():
 
