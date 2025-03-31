@@ -856,9 +856,9 @@ def approve_money_request(parent_chat_id):
         parent_escaped_message = parent_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
         dependent_escaped_message = dependent_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
 
-        keyboard = {
+        keyboard = [
             [{"text": "💰 Check Balance", "callback_data": "check_balance"}]
-        }
+        ]
 
         send_telegram_message_with_keyboard(
             parent_chat_id, parent_escaped_message, keyboard
