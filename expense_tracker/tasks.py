@@ -289,7 +289,7 @@ def extract_and_notify(text, escaped_transcript, chat_id):
                                 "category_type": category,
                             },
                         )
-                        expense_category_type_doc.budget -= amount
+                        expense_category_type_doc.budget -= extracted_details.get("amount", 0.0)
                         expense_category_type_doc.save(ignore_permissions=True)
                         frappe.db.commit()
                 except Exception as e:
@@ -320,7 +320,7 @@ def extract_and_notify(text, escaped_transcript, chat_id):
                                 "category_type": category,
                             },
                         )
-                        expense_category_type_doc.budget -= amount
+                        expense_category_type_doc.budget -= extracted_details.get("amount", 0.0)
                         expense_category_type_doc.save(ignore_permissions=True)
                         frappe.db.commit()
                 except Exception as e:
@@ -329,7 +329,7 @@ def extract_and_notify(text, escaped_transcript, chat_id):
             if is_primary:
                 try:
                     primary_account = frappe.get_doc("Primary Account", {"telegram_id": chat_id})
-                    primary_account.salary -= amount
+                    primary_account.salary -= extracted_details.get("amount", 0.0)
                     primary_account.save(ignore_permissions=True)
                     frappe.db.commit()
                 except Exception as e:
@@ -337,8 +337,8 @@ def extract_and_notify(text, escaped_transcript, chat_id):
             elif is_family:
                 try:
                     family_member = frappe.get_doc("Family Member", {"telegram_id": chat_id})
-                    if family_member.pocket_money >= amount:
-                        family_member.pocket_money -= amount
+                    if family_member.pocket_money >= extracted_details.get("amount", 0.0):
+                        family_member.pocket_money -= extracted_details.get("amount", 0.0)
                         family_member.save(ignore_permissions=True)
                         frappe.db.commit()
                     else:
