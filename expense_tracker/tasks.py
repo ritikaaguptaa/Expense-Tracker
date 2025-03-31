@@ -111,6 +111,7 @@ def get_audio_file_path():
         return site_path
     return None
 
+
 async def transcribe_audio_async(file_url, chat_id):
     """Asynchronous function to transcribe audio using Deepgram API."""
     try:
@@ -244,10 +245,7 @@ def extract_and_notify(text, escaped_transcript, chat_id):
     extracted_details = extract_details_from_text(text)
 
     if extracted_details:
-        # Ensure values are escaped properly
-        amount = escape_markdown_v2(
-            f"{extracted_details.get('amount', 'N/A'):.2f}"
-        )  # Force two decimal places for consistency
+        amount = escape_markdown_v2(f"{extracted_details.get('amount', 'N/A'):.2f}")
         category = escape_markdown_v2(extracted_details.get("category", "N/A"))
         merchant = escape_markdown_v2(
             extracted_details.get("merchant", "N/A")
@@ -310,7 +308,7 @@ def extract_and_notify(text, escaped_transcript, chat_id):
         else:
             primary_account_doc = frappe.get_doc(
                 "Primary Account", {"telegram_id": chat_id}
-            )   
+            )
 
             allowed_categories = [
                 d.category_type
@@ -360,12 +358,10 @@ def extract_and_notify(text, escaped_transcript, chat_id):
                 )
                 return
 
-        keyboard = {
-            "inline_keyboard": [
-                [{"text": "💰 Check Balance", "callback_data": "check_balance"}],
-                [{"text": "📊 View Report", "callback_data": "view_report"}],
-            ]
-        }
+        keyboard = [
+            [{"text": "💰 Check Balance", "callback_data": "check_balance"}],
+            [{"text": "📊 View Report", "callback_data": "view_report"}],
+        ]
 
         if is_primary:
             keyboard.append([{"text": "➕ Add Money", "callback_data": "add_money"}])
@@ -373,8 +369,6 @@ def extract_and_notify(text, escaped_transcript, chat_id):
             keyboard.append(
                 [{"text": "🛎️ Request Money", "callback_data": "request_money"}]
             )
-
-        reply_markup = json.dumps(keyboard)
 
         message = f"""
     🎙️ *Transcription Complete\!*
@@ -407,11 +401,11 @@ def extract_and_notify(text, escaped_transcript, chat_id):
         )
 
         expense.insert(ignore_permissions=True)
-        send_telegram_message(chat_id, message, reply_markup)
+        send_telegram_message_with_keyboard(chat_id, message, keyboard)
         # frappe.db.commit()
     else:
         send_telegram_message(
-            chat_id, "❌ Sorry, we couldn't extract the details from the text provided."
+            chat_id, "❌ Sorry, we couldn't extract the details from the text provided\."
         )
 
 
@@ -625,7 +619,7 @@ def telegram_webhook():
                 if not (primary_exist or family_exist):
                     send_telegram_message(
                         chat_id,
-                        "⚠️ You are not registered! Please verify your account before using voice messages.",
+                        "⚠️ You are not registered\! Please verify your account before using voice messages\.",
                     )
                     return
 
@@ -707,19 +701,34 @@ def telegram_webhook():
                             )
                     if not parent_exists:
                         message = "❌ Invalid Parent ID. Please try again."
-                        escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
+                        escaped_message = (
+                            message.replace(".", "\\.")
+                            .replace("!", "\\!")
+                            .replace("*", "\\*")
+                            .replace("_", "\\_")
+                        )
                         send_telegram_message(chat_id, escaped_message)
                         return {"ok": False, "error": "Invalid Parent ID"}
-                    
+
                     if user_role == "role_parent":
                         message = "🎉 *You are verified as a Parent!* Now, track your expenses daily! 💳"
-                        escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
+                        escaped_message = (
+                            message.replace(".", "\\.")
+                            .replace("!", "\\!")
+                            .replace("*", "\\*")
+                            .replace("_", "\\_")
+                        )
                         send_telegram_message(chat_id, escaped_message)
-                    
-                    elif user_role == "role_dependent":  
+
+                    elif user_role == "role_dependent":
                         if frappe.db.exists("Family Member", {"telegram_id": chat_id}):
                             message = "✅ *You're already registered!* Start tracking your expenses now. 📊"
-                            escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
+                            escaped_message = (
+                                message.replace(".", "\\.")
+                                .replace("!", "\\!")
+                                .replace("*", "\\*")
+                                .replace("_", "\\_")
+                            )
                             send_telegram_message(chat_id, escaped_message)
 
                         else:
@@ -789,7 +798,12 @@ def telegram_webhook():
                         )
 
                         message = "🎉 *You are verified as a Dependent!* Now, track your expenses daily! 🏦"
-                        escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_") 
+                        escaped_message = (
+                            message.replace(".", "\\.")
+                            .replace("!", "\\!")
+                            .replace("*", "\\*")
+                            .replace("_", "\\_")
+                        )
                         send_telegram_message(chat_id, escaped_message)
 
                     elif user_role == "request_money":
@@ -830,22 +844,18 @@ def telegram_webhook():
                                 .replace("*", "\\*")
                                 .replace("_", "\\_")
                             )
-                            keyboard = {
-                                "inline_keyboard": [
-                                    [
-                                        {
-                                            "text": "✅ Approve",
-                                            "callback_data": "approve",
-                                        }
-                                    ],
-                                    [{"text": "❌ Deny", "callback_data": "deny"}],
-                                ]
-                            }
 
-                            send_telegram_message(
+                            keyboard = [
+                                [{"text": "✅ Approve", "callback_data": "approve"}],
+                                [{"text": "❌ Deny", "callback_data": "deny"}],
+                            ]
+
+                            
+
+                            send_telegram_message_with_keyboard(
                                 primary_account_doc.telegram_id,
                                 parent_escaped_message,
-                                reply_markup=keyboard,
+                                keyboard,
                             )
 
                         else:
@@ -922,16 +932,14 @@ def approve_money_request(parent_chat_id):
         )
 
         keyboard = {
-            "inline_keyboard": [
-                [{"text": "💰 Check Balance", "callback_data": "check_balance"}]
-            ]
+            [{"text": "💰 Check Balance", "callback_data": "check_balance"}]
         }
 
-        send_telegram_message(
-            parent_chat_id, parent_escaped_message, reply_markup=keyboard
+        send_telegram_message_with_keyboard(
+            parent_chat_id, parent_escaped_message, keyboard
         )
-        send_telegram_message(
-            dependent_chat_id, dependent_escaped_message, reply_markup=keyboard
+        send_telegram_message_with_keyboard(
+            dependent_chat_id, dependent_escaped_message, keyboard
         )
     else:
         send_telegram_message(
