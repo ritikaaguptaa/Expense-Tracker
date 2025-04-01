@@ -986,7 +986,7 @@ def store_budget(chat_id, extracted_data):
         )
 
         # Debugging: Check the categories returned from the database
-        print(f"Existing Categories: {existing_categories}")
+        frappe.logger().debug(f"Existing Categories: {existing_categories}")
 
         # Clean and prepare a list of existing category types (strip extra spaces and normalize case)
         existing_category_list = [cat["category_type"].strip().lower() for cat in existing_categories]
@@ -1039,6 +1039,8 @@ def store_budget(chat_id, extracted_data):
             send_telegram_message(chat_id, escaped_non_updated_message)
 
     except Exception as e:
+        # Log the error to Frappe's error log
+        frappe.logger().error(f"Error processing budget for chat ID {chat_id}: {frappe.utils.cstr(e)}")
         # If an error occurs, send an error message
         send_telegram_message(chat_id, f"❌ *Error:* Failed to process budget. {str(e)}")
 
