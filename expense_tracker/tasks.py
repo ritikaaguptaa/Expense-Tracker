@@ -934,6 +934,11 @@ def transcribe_voice_note_sync_wrapper(file_url):
     return asyncio.run(transcribe_voice_note(file_url))
 
 def process_budget_transcription(chat_id, transcript):
+    # Send message to inform user the process has started
+    processing_message = "🔄 *Processing your budget...* This may take a few moments."
+    escaped_processing_message= processing_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
+    send_telegram_message(chat_id, escaped_processing_message)
+    
     prompt = f"""
 You are a highly accurate text parser. Extract the budget categories and amounts from the following statement and return a **strict JSON output**.
 
@@ -966,6 +971,10 @@ Only return a JSON object with category names as keys and amounts as values.
 
 def store_budget(chat_id, extracted_data):
     try:
+        # Notify user that the system is storing the budget
+        storing_message = "💾 *Storing your budget data...* Please wait."
+        escaped_storing_message = storing_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
+        send_telegram_message(chat_id, escaped_storing_message)
 
         primary_account_doc = frappe.get_doc("Primary Account", {"telegram_id": chat_id})
         primary_account_name = primary_account_doc.name
