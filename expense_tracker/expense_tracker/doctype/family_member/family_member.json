@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "format:MID-{####}",
  "creation": "2025-03-10 10:09:50.508580",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -59,10 +60,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-31 01:30:15.630673",
+ "modified": "2025-04-01 12:45:48.730601",
  "modified_by": "Administrator",
  "module": "Expense Tracker",
  "name": "Family Member",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {

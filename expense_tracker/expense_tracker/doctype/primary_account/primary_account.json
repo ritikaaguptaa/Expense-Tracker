@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "format:PID-{####}",
  "creation": "2025-03-10 10:03:03.716605",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -60,10 +61,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-31 00:59:04.811287",
+ "modified": "2025-04-01 12:44:09.257312",
  "modified_by": "Administrator",
  "module": "Expense Tracker",
  "name": "Primary Account",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
