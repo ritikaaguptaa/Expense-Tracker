@@ -974,21 +974,32 @@ def store_budget(chat_id, extracted_data):
         escaped_storing_message = storing_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
         send_telegram_message(chat_id, escaped_storing_message)
 
+        # Get the primary account details based on the Telegram ID
         primary_account_doc = frappe.get_doc("Primary Account", {"telegram_id": chat_id})
         primary_account_name = primary_account_doc.name
 
+        # Fetch all existing categories for the user
         existing_categories = frappe.get_all(
             "Expense Category",
             filters={"associated_account_holder": primary_account_name},
             fields=["category_type"]
         )
-        existing_category_list = [cat["category_type"] for cat in existing_categories]
+
+        # Debugging: Check the categories returned from the database
+        print(f"Existing Categories: {existing_categories}")
+
+        # Clean and prepare a list of existing category types (strip extra spaces and normalize case)
+        existing_category_list = [cat["category_type"].strip().lower() for cat in existing_categories]
 
         updated_categories = []
         non_updated_categories = []
 
+        # Iterate over the extracted data and compare with existing categories
         for category, amount in extracted_data.items():
-            if category in existing_category_list:
+            cleaned_category = category.strip().lower()  # Normalize category name
+
+            if cleaned_category in existing_category_list:
+                # If category exists, update the budget
                 category_doc = frappe.get_doc("Expense Category", {
                     "category_type": category,
                     "associated_account_holder": primary_account_name
@@ -998,10 +1009,13 @@ def store_budget(chat_id, extracted_data):
                 category_doc.save(ignore_permissions=True)
                 updated_categories.append(f"✅ *{category}:* ₹{amount}")
             else:
+                # If category does not exist, append to the non-updated list
                 non_updated_categories.append(f"❌ *{category}*")
 
+        # Commit the changes to the database
         frappe.db.commit()
 
+        # Notify user about updated categories
         if updated_categories:
             updated_message = (
                 "📊 *Budget Updated Successfully!* 💰\n\n"
@@ -1012,6 +1026,7 @@ def store_budget(chat_id, extracted_data):
             escaped_updated_message = updated_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
             send_telegram_message(chat_id, escaped_updated_message)
 
+        # Notify user about categories that were not updated
         if non_updated_categories:
             non_updated_message = (
                 "⚠️ *Some Categories Were Not Updated* ❌\n\n"
@@ -1024,6 +1039,7 @@ def store_budget(chat_id, extracted_data):
             send_telegram_message(chat_id, escaped_non_updated_message)
 
     except Exception as e:
+        # If an error occurs, send an error message
         send_telegram_message(chat_id, f"❌ *Error:* Failed to process budget. {str(e)}")
 
 def get_telegram_file_url(file_id):
