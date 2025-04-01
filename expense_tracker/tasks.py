@@ -974,48 +974,65 @@ def store_budget(chat_id, extracted_data):
         escaped_storing_message = storing_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
         send_telegram_message(chat_id, escaped_storing_message)
 
-        # Get the primary account details based on the Telegram ID
-        primary_account_doc = frappe.get_doc("Primary Account", {"telegram_id": chat_id})
-        primary_account_name = primary_account_doc.name
+        frappe.logger().info(f"Processing budget storage for chat_id: {chat_id}")
 
-        # Fetch all existing categories for the user
-        existing_categories = frappe.get_all(
-            "Expense Category",
-            filters={"associated_account_holder": primary_account_name},
-            fields=["category_type"]
-        )
+        # Fetch primary account based on Telegram ID
+        try:
+            primary_account_doc = frappe.get_doc("Primary Account", {"telegram_id": chat_id})
+            primary_account_name = primary_account_doc.name
+        except Exception as e:
+            frappe.logger().error(f"Failed to fetch Primary Account for chat_id {chat_id}: {str(e)}")
+            send_telegram_message(chat_id, "❌ *Error:* Unable to fetch account details.")
+            return
 
-        # Debugging: Check the categories returned from the database
-        frappe.logger().debug(f"Existing Categories: {existing_categories}")
+        frappe.logger().info(f"Primary account found: {primary_account_name}")
 
-        # Clean and prepare a list of existing category types (strip extra spaces and normalize case)
-        existing_category_list = [cat["category_type"].strip().lower() for cat in existing_categories]
+        # Fetch existing expense categories
+        try:
+            existing_categories = frappe.get_all(
+                "Expense Category",
+                filters={"associated_account_holder": primary_account_name},
+                fields=["category_type"]
+            )
+        except Exception as e:
+            frappe.logger().error(f"Error fetching existing categories: {str(e)}")
+            send_telegram_message(chat_id, "❌ *Error:* Unable to fetch existing categories.")
+            return
+
+        existing_category_list = [cat["category_type"] for cat in existing_categories]
+        frappe.logger().info(f"Existing categories for {primary_account_name}: {existing_category_list}")
 
         updated_categories = []
         non_updated_categories = []
 
-        # Iterate over the extracted data and compare with existing categories
         for category, amount in extracted_data.items():
-            cleaned_category = category.strip().lower()  # Normalize category name
+            try:
+                if category in existing_category_list:
+                    category_doc = frappe.get_doc("Expense Category", {
+                        "category_type": category,
+                        "associated_account_holder": primary_account_name
+                    })
+                    
+                    frappe.logger().info(f"Updating budget for category: {category}, Amount: {amount}")
 
-            if cleaned_category in existing_category_list:
-                # If category exists, update the budget
-                category_doc = frappe.get_doc("Expense Category", {
-                    "category_type": category,
-                    "associated_account_holder": primary_account_name
-                })
+                    category_doc.budget = int(amount)
+                    category_doc.save(ignore_permissions=True)
+                    updated_categories.append(f"✅ *{category}:* ₹{amount}")
+                else:
+                    frappe.logger().warning(f"Category not found: {category}")
+                    non_updated_categories.append(f"❌ *{category}*")
+            except Exception as e:
+                frappe.logger().error(f"Error processing category {category}: {str(e)}")
 
-                category_doc.budget = int(amount)
-                category_doc.save(ignore_permissions=True)
-                updated_categories.append(f"✅ *{category}:* ₹{amount}")
-            else:
-                # If category does not exist, append to the non-updated list
-                non_updated_categories.append(f"❌ *{category}*")
+        # Commit changes to database
+        try:
+            frappe.db.commit()
+        except Exception as e:
+            frappe.logger().error(f"Database commit failed: {str(e)}")
+            send_telegram_message(chat_id, "❌ *Error:* Failed to update the budget in the database.")
+            return
 
-        # Commit the changes to the database
-        frappe.db.commit()
-
-        # Notify user about updated categories
+        # Send success message
         if updated_categories:
             updated_message = (
                 "📊 *Budget Updated Successfully!* 💰\n\n"
@@ -1026,7 +1043,7 @@ def store_budget(chat_id, extracted_data):
             escaped_updated_message = updated_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
             send_telegram_message(chat_id, escaped_updated_message)
 
-        # Notify user about categories that were not updated
+        # Send failure message for missing categories
         if non_updated_categories:
             non_updated_message = (
                 "⚠️ *Some Categories Were Not Updated* ❌\n\n"
@@ -1034,14 +1051,11 @@ def store_budget(chat_id, extracted_data):
                 + "\n".join(non_updated_categories) +
                 "\n\n🔹 *Please add them first before setting a budget.*"
             )
-
             escaped_non_updated_message = non_updated_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
             send_telegram_message(chat_id, escaped_non_updated_message)
 
     except Exception as e:
-        # Log the error to Frappe's error log
-        frappe.logger().error(f"Error processing budget for chat ID {chat_id}: {frappe.utils.cstr(e)}")
-        # If an error occurs, send an error message
+        frappe.logger().error(f"Unexpected error in store_budget: {str(e)}")
         send_telegram_message(chat_id, f"❌ *Error:* Failed to process budget. {str(e)}")
 
 def get_telegram_file_url(file_id):
