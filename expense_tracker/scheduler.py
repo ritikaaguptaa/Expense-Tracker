@@ -24,5 +24,7 @@ def monthly_add_money_reminder():
         
         escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
         send_telegram_message_with_keyboard(chat_id, escaped_message, keyboard)
+        frappe.logger().info(f"Sent reminder to {full_name} ({chat_id})")
 
-    return {"status": "success", "message": "Monthly add money reminder sent to all users."}
+    frappe.logger().info("Monthly Budget Reminder completed.")
+    return {"status": "success", "message": "Reminders sent to all users."}
