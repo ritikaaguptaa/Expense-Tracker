@@ -1,6 +1,7 @@
 import frappe
 from expense_tracker.tasks import send_telegram_message_with_keyboard
 
+@frappe.whitelist(allow_guest=True)
 def monthly_add_money_reminder():
     primary_accounts = frappe.get_all("Primary Account", fields=["telegram_id", "full_name"])
 
