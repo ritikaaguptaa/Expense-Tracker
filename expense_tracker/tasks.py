@@ -604,6 +604,8 @@ def telegram_webhook():
                     transcript = asyncio.run(transcribe_voice_note(file_url)) 
                     process_budget_transcription(chat_id, transcript)
 
+                    return
+
                 primary_exist = frappe.db.exists(
                     "Primary Account", {"telegram_id": chat_id}
                 )
@@ -694,7 +696,14 @@ def telegram_webhook():
                                 .replace("*", "\\*")
                                 .replace("_", "\\_")
                             )
+
+                            primary_account_doc = frappe.get_doc("Primary Account", text)
+                            primary_account_doc.telegram_id = chat_id  
+                            primary_account_doc.save()  
+                            frappe.db.commit()
+
                             send_telegram_message(chat_id, escaped_message)
+                            return {"ok": True}
 
                         elif user_role == "role_dependent":
                             if frappe.db.exists("Family Member", {"telegram_id": chat_id}):
