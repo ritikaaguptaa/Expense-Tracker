@@ -601,7 +601,7 @@ def telegram_webhook():
                     voice_file_id = data["message"]["voice"]["file_id"]
                     file_url = get_telegram_file_url(voice_file_id)
 
-                    transcript = asyncio.run(transcribe_voice_note(file_url)) 
+                    transcript = transcribe_voice_note_sync_wrapper(file_url)
                     process_budget_transcription(chat_id, transcript)
 
                     return
@@ -699,7 +699,7 @@ def telegram_webhook():
 
                             primary_account_doc = frappe.get_doc("Primary Account", text)
                             primary_account_doc.telegram_id = chat_id  
-                            primary_account_doc.save()  
+                            primary_account_doc.save(ignore_permissions=True)
                             frappe.db.commit()
 
                             send_telegram_message(chat_id, escaped_message)
@@ -929,6 +929,9 @@ async def transcribe_voice_note(file_url):
 
     transcript = response["results"]["channels"][0]["alternatives"][0]["transcript"]
     return transcript.replace(".", "\\.").replace("!", "\\!")
+
+def transcribe_voice_note_sync_wrapper(file_url):
+    return asyncio.run(transcribe_voice_note(file_url))
 
 def process_budget_transcription(chat_id, transcript):
     prompt = f"""
