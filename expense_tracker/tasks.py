@@ -239,9 +239,6 @@ def escape_markdown_v2(text):
         r"([" + re.escape(escape_chars) + r"])", r"\\\1", str(text)
     )  # Ensure conversion to string
 
-
-import frappe
-
 def extract_and_notify(text, escaped_transcript, chat_id):
     """Extract details from text and send as a Telegram notification."""
     try:
@@ -548,6 +545,15 @@ def telegram_webhook():
                 message = "💸 *Enter the amount you want to request.*"
             elif callback_data == "view_report":
                 message = "📊 *Report Unavailable!* This feature is currently under development. Stay tuned for updates."
+            if callback_data == "set_monthly_budget":
+                frappe.cache.set_value(f"set_budget_{chat_id}", True)
+                message = """
+            🎙️ *Send a voice note describing your budget for each category!*  
+            For example:  
+            "_Food ₹5000, Travel ₹3000, Shopping ₹2000_"  
+            """
+                escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
+                send_telegram_message(chat_id, escaped_message)
             elif callback_data == "approve":
                 approve_money_request(chat_id)
                 return {"ok": True}
@@ -591,6 +597,13 @@ def telegram_webhook():
                 send_telegram_message_with_keyboard(chat_id, escaped_message, keyboard)
 
             elif "voice" in data["message"]:
+                if frappe.cache.get_value(f"set_budget_{chat_id}"):
+                    voice_file_id = data["message"]["voice"]["file_id"]
+                    file_url = get_telegram_file_url(voice_file_id)
+
+                    transcript = asyncio.run(transcribe_voice_note(file_url)) 
+                    process_budget_transcription(chat_id, transcript)
+
                 primary_exist = frappe.db.exists(
                     "Primary Account", {"telegram_id": chat_id}
                 )
@@ -739,7 +752,7 @@ def telegram_webhook():
 
                         if text.isdigit():
                             amount = int(text)
-                            primary_account_doc = frappe.get_doc("Primary Account", filters={"telegram_id": chat_id})
+                            primary_account_doc = frappe.get_doc("Primary Account", {"telegram_id": chat_id})
 
                             if primary_account_doc:
                                 primary_account_doc.salary += amount
@@ -897,6 +910,102 @@ def deny_money_request(parent_chat_id):
     frappe.cache.delete_value(f"request_parent_{parent_chat_id}")
     return {"ok": True}
 
+async def transcribe_voice_note(file_url):
+    deepgram = Deepgram(DEEPGRAM_API_KEY)
+
+    response = await deepgram.transcription.prerecorded(
+        {"url": file_url},  
+        {"punctuate": True, "model": "nova", "language": "en"},
+    )
+
+    transcript = response["results"]["channels"][0]["alternatives"][0]["transcript"]
+    return transcript.replace(".", "\\.").replace("!", "\\!")
+
+def process_budget_transcription(chat_id, transcript):
+    prompt = f"""
+You are a highly accurate text parser. Extract the budget categories and amounts from the following statement and return a **strict JSON output**.
+
+### **Example Input:**
+"{transcript}"
+
+### **Example Output:**
+{{
+  "Food": 5000,
+  "Travel": 3000,
+  "Shopping": 2000
+}}
+
+Only return a JSON object with category names as keys and amounts as values.
+"""
+    model = genai.GenerativeModel("gemini-1.5-pro-latest")
+    response = model.generate_content(prompt)
+    
+    extracted_data = response.text.strip()
+
+    cleaned_json = re.sub(r"```json|```", "", extracted_data).strip()
+
+    try:
+        details = json.loads(cleaned_json)
+    except json.JSONDecodeError:
+        print("Error: Gemini response is not valid JSON")
+        return None
+    
+    store_budget(chat_id, details)
+
+def store_budget(chat_id, extracted_data):
+    try:
+
+        primary_account_doc = frappe.get_doc("Primary Account", {"telegram_id": chat_id})
+        primary_account_name = primary_account_doc.name
+
+        existing_categories = frappe.get_all(
+            "Expense Category",
+            filters={"associated_account_holder": primary_account_name},
+            fields=["category_type"]
+        )
+        existing_category_list = [cat["category_type"] for cat in existing_categories]
+
+        updated_categories = []
+        non_updated_categories = []
+
+        for category, amount in extracted_data.items():
+            if category in existing_category_list:
+                category_doc = frappe.get_doc("Expense Category", {
+                    "category_type": category,
+                    "associated_account_holder": primary_account_name
+                })
+
+                category_doc.budget = int(amount)
+                category_doc.save(ignore_permissions=True)
+                updated_categories.append(f"✅ *{category}:* ₹{amount}")
+            else:
+                non_updated_categories.append(f"❌ *{category}*")
+
+        frappe.db.commit()
+
+        if updated_categories:
+            updated_message = (
+                "📊 *Budget Updated Successfully!* 💰\n\n"
+                "Your budget has been set for the following categories:\n\n"
+                + "\n".join(updated_categories) +
+                "\n\n🔹 *You can now track your expenses effectively!* 🚀"
+            )
+            escaped_updated_message = updated_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
+            send_telegram_message(chat_id, escaped_updated_message)
+
+        if non_updated_categories:
+            non_updated_message = (
+                "⚠️ *Some Categories Were Not Updated* ❌\n\n"
+                "The following categories do not exist in your account:\n\n"
+                + "\n".join(non_updated_categories) +
+                "\n\n🔹 *Please add them first before setting a budget.*"
+            )
+
+            escaped_non_updated_message = non_updated_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
+            send_telegram_message(chat_id, escaped_non_updated_message)
+
+    except Exception as e:
+        send_telegram_message(chat_id, f"❌ *Error:* Failed to process budget. {str(e)}")
 
 def get_telegram_file_url(file_id):
     bot_token = os.getenv("BOT_TOKEN")

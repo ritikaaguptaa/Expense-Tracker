@@ -162,7 +162,7 @@ scheduler_events = {
 		"expense_tracker.tasks.weekly_spending_summary"
 	],
 	"monthly": [
-		"expense_tracker.tasks.monthly_pocket_money_scheduler"
+		"expense_tracker.scheduler.monthly_add_money_reminder"
 	],
 }
 
