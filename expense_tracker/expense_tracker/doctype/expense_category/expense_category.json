@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "format:{category_type}-{associated_account_holder}-{####}",
  "creation": "2025-03-10 10:14:45.207698",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -37,10 +38,11 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-10 10:23:08.641209",
+ "modified": "2025-04-01 14:24:26.507914",
  "modified_by": "Administrator",
  "module": "Expense Tracker",
  "name": "Expense Category",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {

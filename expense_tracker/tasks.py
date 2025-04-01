@@ -346,7 +346,7 @@ def extract_and_notify(text, escaped_transcript, chat_id):
 
             keyboard = [
                 [{"text": "💰 Check Balance", "callback_data": "check_balance"}],
-                [{"text": "📊 View Report", "callback_data": "view_report"}],
+                [{"text": "📊 View Report - CS", "callback_data": "view_report"}],
             ]
 
             if is_primary:
@@ -552,8 +552,6 @@ def telegram_webhook():
             For example:  
             "_Food ₹5000, Travel ₹3000, Shopping ₹2000_"  
             """
-                escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
-                send_telegram_message(chat_id, escaped_message)
             elif callback_data == "approve":
                 approve_money_request(chat_id)
                 return {"ok": True}
@@ -584,7 +582,7 @@ def telegram_webhook():
                 )
 
                 keyboard = [
-                    [{"text": "👨‍👩‍👦 Parent", "callback_data": "role_parent"}],
+                    [{"text": "👨‍👩‍👦 Primary", "callback_data": "role_parent"}],
                     [{"text": "🧑‍🎓 Dependent", "callback_data": "role_dependent"}],
                 ]
 
