@@ -940,38 +940,64 @@ def transcribe_voice_note_sync_wrapper(file_url):
 def process_budget_transcription(chat_id, transcript):
     # Send message to inform user the process has started
     processing_message = "🔄 *Processing your budget...* This may take a few moments."
-    escaped_processing_message= processing_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
-    send_telegram_message(chat_id, escaped_processing_message)
-    
-    prompt = f"""
-You are a highly accurate text parser. Extract the budget categories and amounts from the following statement and return a **strict JSON output**.
+    send_telegram_message(chat_id, escape_markdown_v2(processing_message))
 
-### **Example Input:**
+    prompt = f"""
+You are a highly accurate text parser. Extract the budget categories and their corresponding amounts from the following user input. Return the result as a **single JSON object**. The keys of the JSON object should be the budget categories, and the values should be the amounts as integers.
+
+**User Input:**
 "{transcript}"
 
-### **Example Output:**
+**Example Output:**
 {{
   "Food": 5000,
   "Travel": 3000,
   "Shopping": 2000
 }}
 
-Only return a JSON object with category names as keys and amounts as values.
+Ensure that the output is strictly a valid JSON object and nothing else. Do not include any explanations or conversational text. If no budget information can be extracted, return an empty JSON object: {{}}.
 """
-    model = genai.GenerativeModel("gemini-1.5-pro-latest")
-    response = model.generate_content(prompt)
-    
-    extracted_data = response.text.strip()
-
-    cleaned_json = re.sub(r"```json|```", "", extracted_data).strip()
+    print(f"Prompt sent to Gemini: {prompt}") # Debugging
+    frappe.log_error(f"Prompt sent to Gemini: {prompt}", "Budget Transcription") # Debugging
 
     try:
-        details = json.loads(cleaned_json)
-    except json.JSONDecodeError:
-        print("Error: Gemini response is not valid JSON")
-        return None
-    
-    store_budget(chat_id, details)
+        model = genai.GenerativeModel("gemini-1.5-pro-latest")
+        response = model.generate_content(prompt)
+        print(f"Gemini Response Text: {response.text}") # Debugging
+        frappe.log_error(f"Gemini Response Text: {response.text}", "Budget Transcription") # Debugging
+
+        extracted_data_str = response.text.strip()
+
+        # Attempt to parse the JSON directly
+        try:
+            details = json.loads(extracted_data_str)
+            print(f"Parsed JSON (Direct): {details}") # Debugging
+            frappe.log_error(f"Parsed JSON (Direct): {details}", "Budget Transcription") # Debugging
+            store_budget(chat_id, details)
+            return
+
+        except json.JSONDecodeError:
+            print("Error: Gemini response is not valid JSON (Direct Attempt). Trying to clean...")
+            frappe.log_error("Error: Gemini response is not valid JSON (Direct Attempt). Trying to clean...", "Budget Transcription")
+            cleaned_json = re.sub(r"```json|```", "", extracted_data_str).strip()
+            print(f"Cleaned JSON: {cleaned_json}") # Debugging
+            frappe.log_error(f"Cleaned JSON: {cleaned_json}", "Budget Transcription") # Debugging
+            try:
+                details = json.loads(cleaned_json)
+                print(f"Parsed JSON (Cleaned): {details}") # Debugging
+                frappe.log_error(f"Parsed JSON (Cleaned): {details}", "Budget Transcription") # Debugging
+                store_budget(chat_id, details)
+                return
+            except json.JSONDecodeError as e:
+                print(f"Error: Gemini response is not valid JSON even after cleaning: {e}")
+                frappe.log_error(f"Error: Gemini response is not valid JSON even after cleaning: {e}", "Budget Transcription")
+                send_telegram_message(chat_id, escape_markdown_v2("❌ *Error:* Sorry, I couldn't understand your budget. Please try again with clear categories and amounts."))
+                return
+
+    except Exception as e:
+        print(f"Error during Gemini processing: {e}")
+        frappe.log_error(f"Error during Gemini processing: {e}", "Budget Transcription")
+        send_telegram_message(chat_id, escape_markdown_v2("❌ *Error:* There was an issue processing your request. Please try again later."))
 
 @frappe.whitelist()
 def store_budget(chat_id, extracted_data):
