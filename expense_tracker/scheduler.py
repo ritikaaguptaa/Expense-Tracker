@@ -95,7 +95,7 @@ def send_weekly_family_spending_summary():
             member_id = member["name"]
 
             member_doc = frappe.get_doc("Family Member", member_id)
-            member_name = member_doc.get("name")  # Access name from the document
+            member_name = member_doc.get("full_name") 
 
             expenses = frappe.db.sql("""
                 SELECT category, SUM(amount) as total_spent
