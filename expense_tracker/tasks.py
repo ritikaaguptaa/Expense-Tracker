@@ -1024,7 +1024,7 @@ def store_budget(chat_id, extracted_data):
             filters={"associated_account_holder": primary_account_name},
             fields=["category_type"]
         )
-        existing_category_list = [cat["category_type"] for cat in existing_categories]
+        existing_category_list = [cat["category_type"].lower() for cat in existing_categories]
         frappe.log_error(f"Existing categories for {primary_account_name}: {existing_category_list}", "Budget Storage")
 
         updated_categories = []
@@ -1034,7 +1034,7 @@ def store_budget(chat_id, extracted_data):
             escaped_category = escape_markdown_v2(category)
             frappe.log_error(f"Processing extracted category: '{category}' with amount: {amount}", "Budget Storage") # Log each extracted category
 
-            if category in existing_category_list:
+            if category.lower() in existing_category_list:
                 frappe.log_error(f"Category '{category}' found in existing categories.", "Budget Storage")
                 try:
                     frappe.db.set_value(
