@@ -465,11 +465,13 @@ def send_telegram_message(chat_id, message):
         print(response_data)
 
         if not response_data.get("ok"):
-            frappe.logger().error(
-                f"Failed to send Telegram notification: {response_data}"
+            frappe.log_error(
+                f"Failed to send Telegram notification to chat ID {chat_id}: {response_data}",
+                "Telegram Send Error"
             )
     except Exception as e:
-        frappe.logger().error(f"Error sending Telegram message: {str(e)}")
+        frappe.log_error(f"Error sending Telegram message to chat ID {chat_id}: {str(e)}", "Telegram Send Error")
+
 
 
 def send_telegram_message_with_keyboard(chat_id, message, keyboard):
