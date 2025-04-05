@@ -36,18 +36,19 @@ def monthly_add_money_reminder():
 def send_weekly_parent_spending_summary():
     try:
         today = datetime.today()
-        frappe.logger().debug(f"Today's date: {today}")
+        frappe.log_error(f"Weekly Spending Summary: Starting execution. Today's date: {today}", "Weekly Spending Summary")
 
         last_week_start = today - timedelta(days=today.weekday() + 7)
         last_week_end = last_week_start + timedelta(days=6)
-        frappe.logger().debug(f"Last week start: {last_week_start}, end: {last_week_end}")
+        frappe.log_error(f"Weekly Spending Summary: Last week start: {last_week_start}, end: {last_week_end}", "Weekly Spending Summary")
 
         primary_accounts = frappe.get_all("Primary Account", fields=["telegram_id", "name"])
-        frappe.logger().debug(f"Primary Accounts: {primary_accounts}")
+        frappe.log_error(f"Weekly Spending Summary: Primary Accounts fetched: {primary_accounts}", "Weekly Spending Summary")
 
         for account in primary_accounts:
             chat_id = account["telegram_id"]
-            frappe.logger().debug(f"Processing account: {account['name']}, Telegram ID: {chat_id}")
+            account_name = account["name"]
+            frappe.log_error(f"Weekly Spending Summary: Processing account: {account_name}, Telegram ID: {chat_id}", "Weekly Spending Summary")
 
             expenses = frappe.db.sql("""
                 SELECT category, SUM(amount) as total_spent
@@ -56,35 +57,36 @@ def send_weekly_parent_spending_summary():
                 AND date BETWEEN %s AND %s
                 GROUP BY category
             """, (chat_id, last_week_start.strftime('%Y-%m-%d'), last_week_end.strftime('%Y-%m-%d')), as_dict=True)
-            frappe.logger().debug(f"Expenses for {chat_id}: {expenses}")
+            frappe.log_error(f"Weekly Spending Summary: Expenses for {chat_id}: {expenses}", "Weekly Spending Summary")
 
             if not expenses:
-                frappe.logger().debug(f"No expenses found for {chat_id} for the last week.")
+                frappe.log_error(f"Weekly Spending Summary: No expenses found for {account_name} (Telegram ID: {chat_id}) for the last week.", "Weekly Spending Summary")
                 continue
 
             spending_details = "\n".join([f"📌 *{expense['category']}*: ₹{expense['total_spent']}" for expense in expenses])
 
             message = f"""
-    📊 *Weekly Spending Summary* 📅
-    🔹 *Period:* {last_week_start.strftime('%d %b %Y')} - {last_week_end.strftime('%d %b %Y')}
+📊 *Weekly Spending Summary* 📅
+🔹 *Period:* {last_week_start.strftime('%d %b %Y')} - {last_week_end.strftime('%d %b %Y')}
 
-    💰 *Here's what you spent in each category:*
-    {spending_details}
+💰 *Here's what you spent in each category:*
+{spending_details}
 
-    🔹 *Keep track and plan ahead for next week!* 🚀
-                """
+🔹 *Keep track and plan ahead for next week!* 🚀
+            """
 
             escaped_message = escape_markdown(message)
             try:
                 send_telegram_message(chat_id, escaped_message)
-                frappe.logger().debug(f"Telegram message sent to {chat_id}: {escaped_message}")
+                frappe.log_error(f"Weekly Spending Summary: Telegram message sent successfully to {account_name} (Telegram ID: {chat_id})", "Weekly Spending Summary")
             except Exception as telegram_e:
-                frappe.log_error(f"Error sending Telegram message to {chat_id}: {str(telegram_e)}", "Weekly Spending Summary")
+                frappe.log_error(f"Weekly Spending Summary: Error sending Telegram message to {account_name} (Telegram ID: {chat_id}): {str(telegram_e)}", "Weekly Spending Summary")
 
         frappe.db.commit()
+        frappe.log_error(f"Weekly Spending Summary: Execution completed successfully.", "Weekly Spending Summary")
 
     except Exception as e:
-        frappe.log_error(f"Error in Weekly Spending Summary: {str(e)}", "Weekly Spending Summary")
+        frappe.log_error(f"Weekly Spending Summary: An unexpected error occurred: {str(e)}", "Weekly Spending Summary")
 
 @frappe.whitelist(allow_guest=True)
 def send_weekly_family_spending_summary():
