@@ -31,19 +31,22 @@ def monthly_add_money_reminder():
 
     frappe.logger().info("Monthly Budget Reminder completed.")
     return {"status": "success", "message": "Reminders sent to all users."}
-
 @frappe.whitelist(allow_guest=True)
 def send_weekly_parent_spending_summary():
     try:
         today = datetime.today()
+        frappe.log_debug(f"Today's date: {today}")
 
         last_week_start = today - timedelta(days=today.weekday() + 7)
         last_week_end = last_week_start + timedelta(days=6)
+        frappe.log_debug(f"Last week start: {last_week_start}, end: {last_week_end}")
 
         primary_accounts = frappe.get_all("Primary Account", fields=["telegram_id", "name"])
+        frappe.log_debug(f"Primary Accounts: {primary_accounts}")
 
         for account in primary_accounts:
             chat_id = account["telegram_id"]
+            frappe.log_debug(f"Processing account: {account['name']}, Telegram ID: {chat_id}")
 
             expenses = frappe.db.sql("""
                 SELECT category, SUM(amount) as total_spent
@@ -52,30 +55,36 @@ def send_weekly_parent_spending_summary():
                 AND date BETWEEN %s AND %s
                 GROUP BY category
             """, (chat_id, last_week_start.strftime('%Y-%m-%d'), last_week_end.strftime('%Y-%m-%d')), as_dict=True)
+            frappe.log_debug(f"Expenses for {chat_id}: {expenses}")
 
             if not expenses:
-                continue  
+                frappe.log_debug(f"No expenses found for {chat_id} for the last week.")
+                continue
 
             spending_details = "\n".join([f"📌 *{expense['category']}*: ₹{expense['total_spent']}" for expense in expenses])
 
             message = f"""
-📊 *Weekly Spending Summary* 📅  
-🔹 *Period:* {last_week_start.strftime('%d %b %Y')} - {last_week_end.strftime('%d %b %Y')}  
+📊 *Weekly Spending Summary* 📅
+🔹 *Period:* {last_week_start.strftime('%d %b %Y')} - {last_week_end.strftime('%d %b %Y')}
 
-💰 *Here's what you spent in each category:*  
-{spending_details}  
+💰 *Here's what you spent in each category:*
+{spending_details}
 
 🔹 *Keep track and plan ahead for next week!* 🚀
             """
 
             escaped_message = escape_markdown(message)
-            send_telegram_message(chat_id, escaped_message)
+            try:
+                send_telegram_message(chat_id, escaped_message)
+                frappe.log_debug(f"Telegram message sent to {chat_id}: {escaped_message}")
+            except Exception as telegram_e:
+                frappe.log_error(f"Error sending Telegram message to {chat_id}: {str(telegram_e)}", "Weekly Spending Summary")
 
         frappe.db.commit()
 
     except Exception as e:
         frappe.log_error(f"Error in Weekly Spending Summary: {str(e)}", "Weekly Spending Summary")
-
+        
 @frappe.whitelist(allow_guest=True)
 def send_weekly_family_spending_summary():
     try:
