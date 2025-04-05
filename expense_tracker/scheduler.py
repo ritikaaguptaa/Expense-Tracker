@@ -45,7 +45,7 @@ def send_weekly_parent_spending_summary():
             chat_id = account["telegram_id"]
 
             expenses = frappe.db.sql("""
-                SELECT expense_category, SUM(amount) as total_spent
+                SELECT category, SUM(amount) as total_spent
                 FROM `tabExpense`
                 WHERE user_id = %s
                 AND date BETWEEN %s AND %s
@@ -83,7 +83,7 @@ def send_weekly_family_spending_summary():
         last_week_start = today - timedelta(days=today.weekday() + 7)
         last_week_end = last_week_start + timedelta(days=6)
 
-        family_members = frappe.get_all("Family Member", fields=["chat_id", "name"])
+        family_members = frappe.get_all("Family Member", fields=["telegram_id", "name"])
 
         for member in family_members:
             chat_id = member["chat_id"]
@@ -92,7 +92,7 @@ def send_weekly_family_spending_summary():
             member_name = frappe.get_doc("Family Member", member_id)
 
             expenses = frappe.db.sql("""
-                SELECT expense_category, SUM(amount) as total_spent
+                SELECT category, SUM(amount) as total_spent
                 FROM `tabExpense`
                 WHERE user_id = %s
                 AND date BETWEEN %s AND %s
