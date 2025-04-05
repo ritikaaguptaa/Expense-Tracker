@@ -35,12 +35,14 @@ def monthly_add_money_reminder():
 @frappe.whitelist(allow_guest=True)
 def send_weekly_parent_spending_summary():
     try:
-        today = datetime.today()
-        frappe.log_error(f"Weekly Spending Summary: Starting execution. Today's date: {today}", "Weekly Spending Summary")
+        today_india = datetime.now()  # Get current time in India
 
-        last_week_start = today - timedelta(days=today.weekday() + 7)
-        last_week_end = last_week_start + timedelta(days=6)
-        frappe.log_error(f"Weekly Spending Summary: Last week start: {last_week_start}, end: {last_week_end}", "Weekly Spending Summary")
+        # Calculate last week's start and end dates based on India's time
+        last_week_start_india = today_india - timedelta(days=today_india.weekday() + 7)
+        last_week_end_india = last_week_start_india + timedelta(days=6)
+
+        frappe.log_error(f"Weekly Spending Summary (India Time): Today: {today_india.strftime('%Y-%m-%d %H:%M:%S')}", "Weekly Spending Summary")
+        frappe.log_error(f"Weekly Spending Summary (India Time): Last Week Start: {last_week_start_india.strftime('%Y-%m-%d %H:%M:%S')}, End: {last_week_end_india.strftime('%Y-%m-%d %H:%M:%S')}", "Weekly Spending Summary")
 
         primary_accounts = frappe.get_all("Primary Account", fields=["telegram_id", "name"])
         frappe.log_error(f"Weekly Spending Summary: Primary Accounts fetched: {primary_accounts}", "Weekly Spending Summary")
@@ -54,20 +56,20 @@ def send_weekly_parent_spending_summary():
                 SELECT category, SUM(amount) as total_spent
                 FROM `tabExpense`
                 WHERE user_id = %s
-                AND date BETWEEN %s AND %s
+                AND `date` BETWEEN %s AND %s
                 GROUP BY category
-            """, (chat_id, last_week_start.strftime('%Y-%m-%d'), last_week_end.strftime('%Y-%m-%d')), as_dict=True)
+            """, (chat_id, last_week_start_india.strftime('%Y-%m-%d 00:00:00'), last_week_end_india.strftime('%Y-%m-%d 23:59:59')), as_dict=True)
             frappe.log_error(f"Weekly Spending Summary: Expenses for {chat_id}: {expenses}", "Weekly Spending Summary")
 
             if not expenses:
-                frappe.log_error(f"Weekly Spending Summary: No expenses found for {account_name} (Telegram ID: {chat_id}) for the last week.", "Weekly Spending Summary")
+                frappe.log_error(f"Weekly Spending Summary: No expenses found for {account_name} (Telegram ID: {chat_id}) for the period {last_week_start_india.strftime('%Y-%m-%d')} to {last_week_end_india.strftime('%Y-%m-%d')}.", "Weekly Spending Summary")
                 continue
 
             spending_details = "\n".join([f"📌 *{expense['category']}*: ₹{expense['total_spent']}" for expense in expenses])
 
             message = f"""
 📊 *Weekly Spending Summary* 📅
-🔹 *Period:* {last_week_start.strftime('%d %b %Y')} - {last_week_end.strftime('%d %b %Y')}
+🔹 *Period:* {last_week_start_india.strftime('%d %b %Y')} - {last_week_end_india.strftime('%d %b %Y')}
 
 💰 *Here's what you spent in each category:*
 {spending_details}
