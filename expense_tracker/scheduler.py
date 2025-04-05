@@ -35,10 +35,9 @@ def monthly_add_money_reminder():
 @frappe.whitelist(allow_guest=True)
 def send_weekly_parent_spending_summary():
     try:
-        today_india = datetime.now()  # Get current time in India
+        today_india = datetime.now()
 
-        # Calculate last week's start and end dates based on India's time
-        last_week_start_india = today_india - timedelta(days=today_india.weekday() + 7)
+        last_week_start_india = today_india - timedelta(days=today_india.weekday()) - timedelta(days=7)
         last_week_end_india = last_week_start_india + timedelta(days=6)
 
         frappe.log_error(f"Weekly Spending Summary (India Time): Today: {today_india.strftime('%Y-%m-%d %H:%M:%S')}", "Weekly Spending Summary")
@@ -65,11 +64,11 @@ def send_weekly_parent_spending_summary():
                 frappe.log_error(f"Weekly Spending Summary: No expenses found for {account_name} (Telegram ID: {chat_id}) for the period {last_week_start_india.strftime('%Y-%m-%d')} to {last_week_end_india.strftime('%Y-%m-%d')}.", "Weekly Spending Summary")
                 continue
 
-            spending_details = "\n".join([f"📌 *{expense['category']}*: ₹{expense['total_spent']}" for expense in expenses])
+            spending_details = "\n".join([f"📌 *{escape_markdown_v2(expense['category'])}*: ₹{expense['total_spent']}" for expense in expenses])
 
             message = f"""
 📊 *Weekly Spending Summary* 📅
-🔹 *Period:* {last_week_start_india.strftime('%d %b %Y')} - {last_week_end_india.strftime('%d %b %Y')}
+🔹 *Period:* {escape_markdown_v2(last_week_start_india.strftime('%d %b %Y'))} - {escape_markdown_v2(last_week_end_india.strftime('%d %b %Y'))}
 
 💰 *Here's what you spent in each category:*
 {spending_details}
@@ -77,7 +76,9 @@ def send_weekly_parent_spending_summary():
 🔹 *Keep track and plan ahead for next week!* 🚀
             """
 
-            escaped_message = escape_markdown(message)
+            # Escape the entire message using the custom function
+            escaped_message = escape_markdown_v2(message)
+
             try:
                 send_telegram_message(chat_id, escaped_message)
                 frappe.log_error(f"Weekly Spending Summary: Telegram message sent successfully to {account_name} (Telegram ID: {chat_id})", "Weekly Spending Summary")
@@ -89,7 +90,6 @@ def send_weekly_parent_spending_summary():
 
     except Exception as e:
         frappe.log_error(f"Weekly Spending Summary: An unexpected error occurred: {str(e)}", "Weekly Spending Summary")
-
 @frappe.whitelist(allow_guest=True)
 def send_weekly_family_spending_summary():
     try:
@@ -137,6 +137,7 @@ def send_weekly_family_spending_summary():
     except Exception as e:
         frappe.log_error(f"Error in Weekly Family Spending Summary: {str(e)}", "Family Spending Summary")
 
-def escape_markdown(text):
-    escape_chars = r"[_*[\]()~`>#+\-=|{}.!]"
-    return re.sub(f"([{escape_chars}])", r"\\\1", text)
+def escape_markdown_v2(text):
+    """Escapes special characters for Telegram MarkdownV2."""
+    escape_chars = r'_*[]()~`>#+-=|{}.!'
+    return ''.join('\\' + char if char in escape_chars else char for char in text)
