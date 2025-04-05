@@ -1,3 +1,4 @@
+import re
 import frappe
 from datetime import datetime, timedelta
 from expense_tracker.tasks import send_telegram_message_with_keyboard, send_telegram_message
@@ -67,8 +68,7 @@ def send_weekly_parent_spending_summary():
 🔹 *Keep track and plan ahead for next week!* 🚀
             """
 
-            escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("_", "\\_")
-
+            escaped_message = escape_markdown(message)
             send_telegram_message(chat_id, escaped_message)
 
         frappe.db.commit()
@@ -86,7 +86,7 @@ def send_weekly_family_spending_summary():
         family_members = frappe.get_all("Family Member", fields=["telegram_id", "name"])
 
         for member in family_members:
-            chat_id = member["chat_id"]
+            chat_id = member["telegram_id"]
             member_id = member["name"]
 
             member_name = frappe.get_doc("Family Member", member_id)
@@ -114,7 +114,7 @@ def send_weekly_family_spending_summary():
 
             """
 
-            escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("_", "\\_")
+            escaped_message = escape_markdown(message)
 
             send_telegram_message(chat_id, escaped_message)
 
@@ -122,3 +122,7 @@ def send_weekly_family_spending_summary():
 
     except Exception as e:
         frappe.log_error(f"Error in Weekly Family Spending Summary: {str(e)}", "Family Spending Summary")
+
+def escape_markdown(text):
+    escape_chars = r"[_*[\]()~`>#+\-=|{}.!]"
+    return re.sub(f"([{escape_chars}])", r"\\\1", text)
