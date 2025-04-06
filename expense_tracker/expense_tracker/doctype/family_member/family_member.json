@@ -16,9 +16,10 @@
  "fields": [
   {
    "fieldname": "primary_account_holder",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Primary Account Holder",
+   "options": "Primary Account",
    "reqd": 1
   },
   {
@@ -60,7 +61,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-04-06 11:46:51.709515",
+ "modified": "2025-04-06 13:29:22.524067",
  "modified_by": "Administrator",
  "module": "Expense Tracker",
  "name": "Family Member",
