@@ -960,6 +960,7 @@ Ensure that the output is strictly a valid JSON object and nothing else. Do not 
     try:
         model = genai.GenerativeModel("gemini-1.5-pro-latest")
         response = model.generate_content(prompt)
+
         extracted_data_str = response.text.strip()
 
         try:
@@ -969,32 +970,30 @@ Ensure that the output is strictly a valid JSON object and nothing else. Do not 
 
         except json.JSONDecodeError:
             cleaned_json = re.sub(r"```json|```", "", extracted_data_str).strip()
+            frappe.log_error(f"Cleaned JSON: {cleaned_json}", "Budget Transcription") 
             try:
                 details = json.loads(cleaned_json)
                 store_budget(chat_id, details)
                 return
-            except json.JSONDecodeError:
+            except json.JSONDecodeError as e:
                 send_telegram_message(chat_id, escape_markdown_v2("❌ *Error:* Sorry, I couldn't understand your budget. Please try again with clear categories and amounts."))
                 return
 
     except Exception as e:
-        frappe.log_error(f"Error during Gemini processing: {e}", "Budget Transcription")
         send_telegram_message(chat_id, escape_markdown_v2("❌ *Error:* There was an issue processing your request. Please try again later."))
 
 @frappe.whitelist()
 def store_budget(chat_id, extracted_data):
     try:
-        # Notify user that the system is storing the budget
         storing_message = "💾 *Storing your budget data...* Please wait."
         send_telegram_message(chat_id, escape_markdown_v2(storing_message))
 
-        # Fetch primary account based on Telegram ID
         primary_account_name = frappe.db.get_value("Primary Account", {"telegram_id": chat_id}, "name")
         if not primary_account_name:
+            frappe.log_error(f"Failed to fetch Primary Account for chat_id {chat_id}: Account not found.", "Budget Storage")
             send_telegram_message(chat_id, "❌ *Error:* Unable to fetch account details.")
             return
 
-        # Fetch existing expense categories (lowercase for case-insensitive matching)
         existing_categories = frappe.get_all(
             "Expense Category",
             filters={"associated_account_holder": primary_account_name},
@@ -1007,29 +1006,25 @@ def store_budget(chat_id, extracted_data):
 
         for category, amount in extracted_data.items():
             escaped_category = escape_markdown_v2(category)
+
             if category.lower() in existing_category_list:
-                try:
-                    frappe.db.set_value(
-                        "Expense Category",
-                        {"category_type": category, "associated_account_holder": primary_account_name},
-                        "budget",
-                        int(amount),
-                        update_modified=True,
-                    )
-                    updated_categories.append(f"✅ *{escaped_category}:* ₹{amount}")
-                except Exception as e:
-                    frappe.log_error(f"Error updating budget for category {category}: {str(e)}", "Budget Storage")
+                frappe.db.set_value(
+                    "Expense Category",
+                    {"category_type": category, "associated_account_holder": primary_account_name},
+                    "budget",
+                    int(amount),
+                    update_modified=True,
+                )
+                updated_categories.append(f"✅ *{escaped_category}:* ₹{amount}")
             else:
                 non_updated_categories.append(f"❌ *{escaped_category}*")
 
-        # Commit changes to database
         try:
             frappe.db.commit()
         except Exception as e:
             send_telegram_message(chat_id, "❌ *Error:* Failed to update the budget in the database.")
             return
 
-        # Send success message
         if updated_categories:
             updated_message = (
                 "📊 *Budget Updated Successfully!* 💰\n\n"
@@ -1038,8 +1033,9 @@ def store_budget(chat_id, extracted_data):
                 "\n\n🔹 *You can now track your expenses effectively!* 🚀"
             )
             send_telegram_message(chat_id, escape_markdown_v2(updated_message))
+        else:
+            frappe.log_error("No budgets were updated, so no success message sent.", "Budget Storage")
 
-        # Send failure message for missing categories
         if non_updated_categories:
             non_updated_message = (
                 "⚠️ *Some Categories Were Not Updated* ❌\n\n"
@@ -1048,11 +1044,12 @@ def store_budget(chat_id, extracted_data):
                 "\n\n🔹 *Please add them first before setting a budget.*"
             )
             send_telegram_message(chat_id, escape_markdown_v2(non_updated_message))
+        else:
+            frappe.log_error("No non-updated categories, so no missing categories message sent.", "Budget Storage")
 
     except Exception as e:
-        frappe.log_error(f"Unexpected error in store_budget: {str(e)}")
         send_telegram_message(chat_id, escape_markdown_v2(f"❌ *Error:* Failed to process budget. {str(e)}"))
-        
+
 def get_telegram_file_url(file_id):
     bot_token = os.getenv("BOT_TOKEN")
     api_url = f"https://api.telegram.org/bot{bot_token}/getFile?file_id={file_id}"
