@@ -1050,7 +1050,7 @@ def store_budget(chat_id, extracted_data):
                     frappe.log_error(f"Error updating budget for category {category}: {str(e)}", "Budget Storage")
             else:
                 frappe.log_error(f"Category '{category}' not found in existing categories.", "Budget Storage")
-                non_updated_categories.append(f"❌ *{escaped_category}*", "Budget Storage")
+                non_updated_categories.append(f"❌ *{escaped_category}*")
 
         # Commit changes to database
         try:
