@@ -8,9 +8,9 @@ from frappe.utils.password import update_password
 class PrimaryAccount(Document):
     def after_insert(self):
         self.create_user_with_role()
+        self.assign_user_permission()
 
     def create_user_with_role(self):
-        # Check if user already exists
         if not frappe.db.exists("User", self.email):
             # Create User
             user = frappe.get_doc({
@@ -23,10 +23,17 @@ class PrimaryAccount(Document):
             })
             user.insert(ignore_permissions=True)
 
-            # Set password
             update_password(self.email, "expense@1234")
 
-            frappe.msgprint(f"User {self.email} created with role 'Expense Manager'.")
+    def assign_user_permission(self):
+        user_permission = frappe.get_doc({
+            "doctype": "User Permission",
+            "user": self.email,
+            "allow": "Primary Account",
+            "for_value": self.name,
+        })
+        user_permission.insert(ignore_permissions=True)
+
 
 
 @frappe.whitelist()
