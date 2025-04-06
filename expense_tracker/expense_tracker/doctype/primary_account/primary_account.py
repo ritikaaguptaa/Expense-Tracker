@@ -1,11 +1,39 @@
 # Copyright (c) 2025, Siddharth and contributors
 # For license information, please see license.txt
-import frappe
 
+import frappe
 from frappe.model.document import Document
+from frappe.utils.password import update_password
 
 class PrimaryAccount(Document):
-    pass
+    def after_insert(self):
+        self.create_user_with_role()
+        self.assign_user_permission()
+
+    def create_user_with_role(self):
+        if not frappe.db.exists("User", self.email):
+            # Create User
+            user = frappe.get_doc({
+                "doctype": "User",
+                "email": self.email,
+                "first_name": self.full_name,
+                "last_name": self.full_name,
+                "roles": [{"role": "Expense Manager"}],
+                "user_type": "System User"
+            })
+            user.insert(ignore_permissions=True)
+
+            update_password(self.email, "expense@1234")
+
+    def assign_user_permission(self):
+        user_permission = frappe.get_doc({
+            "doctype": "User Permission",
+            "user": self.email,
+            "allow": "Primary Account",
+            "for_value": self.name,
+        })
+        user_permission.insert(ignore_permissions=True)
+
 
 
 @frappe.whitelist()
