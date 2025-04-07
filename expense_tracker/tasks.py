@@ -1026,26 +1026,35 @@ def store_budget(chat_id, extracted_data):
         send_telegram_message(chat_id, escape_markdown_v2(f"❌ *Error:* Failed to process budget. {str(e)}"))
 
 def generate_and_send_report(chat_id):
-    current_year = now_datetime().year
+    try:
+        current_year = frappe.utils.now_datetime().year
 
-    report = frappe.get_doc("Report", "Expense Summary")  # Your report name
-    columns, data = report.get_data(filters={"chat_id": chat_id})
+        report = frappe.get_doc("Report", "Expense Summary")  # Your report name
+        columns, data = report.get_data(filters={"chat_id": chat_id})
 
-    html = frappe.render_template("expense_tracker/templates/pages/expense_report_template.html", {
-        "columns": columns,
-        "data": data,
-        "year": current_year
-    })
+        html = frappe.render_template("expense_tracker/templates/pages/expense_report_template.html", {
+            "columns": columns,
+            "data": data,
+            "year": current_year
+        })
 
-    pdf = get_pdf(html)
+        pdf = frappe.utils.pdf.get_pdf(html)
 
-    file_path = f"/tmp/expense_report_{chat_id}.pdf"
-    with open(file_path, "wb") as f:
-        f.write(pdf)
+        file_path = f"/tmp/expense_report_{chat_id}.pdf"
+        with open(file_path, "wb") as f:
+            f.write(pdf)
 
-    send_pdf_to_telegram(chat_id, file_path)
+        if hasattr(frappe, 'send_pdf_to_telegram'):
+            frappe.send_pdf_to_telegram(chat_id, file_path)
+        else:
+            frappe.log_error("send_pdf_to_telegram function not found.", "Report Generation")
 
-    os.remove(file_path)
+        import os
+        os.remove(file_path)
+
+    except Exception as e:
+        frappe.log_error(frappe.as_json(e), "Report Generation Error")
+        frappe.msgprint(f"An error occurred while generating the report: {e}", indicator='error')
 
 def get_telegram_file_url(file_id):
     bot_token = os.getenv("BOT_TOKEN")
