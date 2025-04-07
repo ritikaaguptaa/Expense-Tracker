@@ -152,19 +152,20 @@ scheduler_events = {
 # 	"all": [
 # 		"expense_tracker.tasks.all"
 # 	],
-# 	"daily": [
-# 		"expense_tracker.tasks.daily"
-# 	],
+	"daily": [
+		"expense_tracker.scheduler.notify_family_on_low_pocket_money"
+	],
 # 	"hourly": [
 # 		"expense_tracker.tasks.hourly"
 # 	],
-	"weekly": [
-		"expense_tracker.tasks.weekly_spending_summary"
-	],
+	# "weekly": [
+	# 	"expense_tracker.tasks.weekly_spending_summary"
+	# ],
 	"monthly": [
 		"expense_tracker.scheduler.monthly_add_money_reminder",
         "expense_tracker.scheduler.send_weekly_parent_spending_summary",
-        "expense_tracker.scheduler.send_weekly_family_spending_summary"
+        "expense_tracker.scheduler.send_weekly_family_spending_summary",
+		"expense_tracker.scheduler.notify_dependents_about_savings"
 	],
 }
 
@@ -244,3 +245,5 @@ scheduler_events = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+
+website_route_rules = [{'from_route': '/frontend/<path:app_path>', 'to_route': 'frontend'},]

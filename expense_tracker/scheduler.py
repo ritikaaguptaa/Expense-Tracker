@@ -3,13 +3,51 @@ import frappe
 from datetime import datetime, timedelta
 from expense_tracker.tasks import send_telegram_message_with_keyboard, send_telegram_message
 
+# @frappe.whitelist(allow_guest=True)
+# def monthly_add_money_reminder():
+#     primary_accounts = frappe.get_all("Primary Account", fields=["telegram_id", "full_name"])
+
+#     for account in primary_accounts:
+#         chat_id = account["telegram_id"]
+#         full_name = account["full_name"]
+
+#         message = f"""
+#         🔔 *Monthly Budget Reminder* 🔔  
+
+#         Hello {full_name},  
+#         It's the start of a new month! 🚀  
+#         Please ensure your budget is updated to manage your expenses smoothly.  
+
+#         ➕ Tap below to set your budget for this month! 👇
+#         """
+#         message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*")
+
+#         keyboard = [
+#             [{"text": "📊 Set Monthly Budget", "callback_data": "set_monthly_budget"}]
+#         ]
+        
+#         escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
+#         send_telegram_message_with_keyboard(chat_id, escaped_message, keyboard)
+#         frappe.logger().info(f"Sent reminder to {full_name} ({chat_id})")
+
+#     frappe.logger().info("Monthly Budget Reminder completed.")
+#     return {"status": "success", "message": "Reminders sent to all users."}
+
+def escape_markdown_v2(text):
+    escape_chars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!']
+    return "".join(f"\\{char}" if char in escape_chars else char for char in text)
+
 @frappe.whitelist(allow_guest=True)
 def monthly_add_money_reminder():
     primary_accounts = frappe.get_all("Primary Account", fields=["telegram_id", "full_name"])
 
     for account in primary_accounts:
-        chat_id = account["telegram_id"]
-        full_name = account["full_name"]
+        chat_id = account.get("telegram_id")
+        full_name = account.get("full_name")
+
+        if not chat_id:
+            frappe.logger().warning(f"Skipping user {full_name} due to missing Telegram ID")
+            continue
 
         message = f"""
         🔔 *Monthly Budget Reminder* 🔔  
@@ -20,12 +58,12 @@ def monthly_add_money_reminder():
 
         ➕ Tap below to set your budget for this month! 👇
         """
+        escaped_message = escape_markdown_v2(message)
 
         keyboard = [
             [{"text": "📊 Set Monthly Budget", "callback_data": "set_monthly_budget"}]
         ]
         
-        escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
         send_telegram_message_with_keyboard(chat_id, escaped_message, keyboard)
         frappe.logger().info(f"Sent reminder to {full_name} ({chat_id})")
 
@@ -135,3 +173,90 @@ def escape_markdown_v2(text):
     """Escapes special characters for Telegram MarkdownV2."""
     escape_chars = r'_*[]()~`>#+-=|{}.!'
     return ''.join('\\' + char if char in escape_chars else char for char in text)
+
+@frappe.whitelist(allow_guest=True)
+def notify_family_on_low_pocket_money():
+    family_members = frappe.get_all(
+        "Family Member", fields=["name", "full_name", "pocket_money", "telegram_id", "primary_account_holder"]
+    )
+
+    for member in family_members:
+        member_full_name = member.get("full_name")
+        member_telegram_id = member.get("telegram_id")
+        member_pocket_money = member.get("pocket_money")
+        primary_account_holder = member.get("primary_account_holder")
+
+        if not member_telegram_id or member_pocket_money is None:
+            frappe.logger().warning(f"Skipping {member_full_name} due to missing Telegram ID or pocket money")
+            continue
+
+        primary_account = frappe.get_value(
+            "Primary Account", 
+            {"name": primary_account_holder}, 
+            "default_pocket_money_for_dependents"
+        )
+
+        if not primary_account:
+            frappe.logger().warning(f"No primary account found for {member_full_name}")
+            continue
+
+        default_pocket_money = primary_account
+        low_pocket_money_threshold = default_pocket_money * 0.2  
+
+        if member_pocket_money < low_pocket_money_threshold:
+            message = f"""
+            ⚠️ *Low Pocket Money Alert* ⚠️
+
+            Hello {member_full_name},  
+            Your remaining pocket money is {member_pocket_money}, which is below the threshold.  
+
+            Please make sure to manage your expenses or reach out to your primary account holder to update your pocket money.
+            """
+            escaped_message = message.replace(".", "\\.").replace("!", "\\!")
+            
+            send_telegram_message(member_telegram_id, escaped_message)
+            frappe.logger().info(f"Sent low pocket money alert to {member_full_name} ({member_telegram_id})")
+
+    frappe.logger().info("Low Pocket Money Notification completed.")
+    return {"status": "success", "message": "Low pocket money reminders sent to all family members."}
+
+
+@frappe.whitelist(allow_guest=True)
+def notify_dependents_about_savings():
+    family_members = frappe.get_all(
+        "Family Member", fields=["name", "full_name", "pocket_money", "telegram_id", "rollover_savings"]
+    )
+
+    for member in family_members:
+        member_name = member.get("name")
+        member_full_name = member.get("full_name")
+        member_telegram_id = member.get("telegram_id")
+        member_pocket_money = member.get("pocket_money", 0)
+        # member_total_expense = member.get("total_expense", 0)
+        member_rollover_savings = member.get("rollover_savings", 0)
+
+        if not member_telegram_id:
+            frappe.logger().warning(f"Skipping {member_full_name} due to missing Telegram ID")
+            continue
+
+        # remaining_pocket_money = max(0, member_pocket_money - member_total_expense)
+        new_rollover_savings = member_rollover_savings + member_pocket_money
+
+        frappe.db.set_value("Family Member", member_name, "rollover_savings", new_rollover_savings)
+
+        message = f"""
+        🏦 *Monthly Savings Update* 🏦
+
+        Hello {member_full_name},  
+        At the end of this month, you have saved {member_pocket_money} from your pocket money.  
+        Your total savings now stand at {new_rollover_savings}. 🎉
+
+        Keep up the good work in managing your expenses!
+        """
+        escaped_message = message.replace(".", "\\.").replace("!", "\\!")
+
+        send_telegram_message(member_telegram_id, escaped_message)
+        frappe.logger().info(f"Sent savings update to {member_full_name} ({member_telegram_id})")
+
+    frappe.logger().info("Savings Notification completed.")
+    return {"status": "success", "message": "Savings notifications sent to all dependents."}

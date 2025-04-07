@@ -3,15 +3,10 @@ import os
 import requests
 import asyncio
 from deepgram import Deepgram
-
-# from dotenv import load_dotenv
 import google.generativeai as genai
 import json
 import re
 import time
-
-# # Load environment variables
-# load_dotenv()
 
 DEEPGRAM_API_KEY = os.getenv("DEEPGRAM_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -115,26 +110,7 @@ def get_audio_file_path():
 async def transcribe_audio_async(file_url, chat_id):
     """Asynchronous function to transcribe audio using Deepgram API."""
     try:
-        # audio_path = frappe.get_site_path("public", file_url.lstrip("/"))
-        # if not audio_path:
-        #     print("No audio file found.")
-        #     return None
-
         deepgram = Deepgram(DEEPGRAM_API_KEY)
-
-        # with open(audio_path, "rb") as audio:
-        #     buffer_data = audio.read()
-
-        # options = {
-        #     "punctuate": True,
-        #     "model": "nova",
-        #     "language": "en",
-        # }
-
-        # response = await deepgram.transcription.prerecorded(
-        #     {"buffer": buffer_data, "mimetype": "audio/ogg"},
-        #     options
-        # )
 
         response = await deepgram.transcription.prerecorded(
             {"url": file_url},  # Use direct URL instead of reading the file
@@ -142,7 +118,6 @@ async def transcribe_audio_async(file_url, chat_id):
         )
 
         transcript = response["results"]["channels"][0]["alternatives"][0]["transcript"]
-        # print("Transcription:", transcript)
 
         escaped_transcript = transcript.replace(".", "\\.").replace("!", "\\!")
 
@@ -194,16 +169,12 @@ def extract_details_from_text(text):
         model = genai.GenerativeModel("gemini-1.5-pro-latest")
         response = model.generate_content(prompt)
 
-        # Ensure response is in JSON format
         extracted_data = response.text.strip()
 
-        # Debugging: Print the raw response
         print("Raw Gemini Response:", extracted_data)
 
-        # Remove backticks and unnecessary formatting
         cleaned_json = re.sub(r"```json|```", "", extracted_data).strip()
 
-        # Try parsing JSON safely
         try:
             details = json.loads(cleaned_json)
         except json.JSONDecodeError:
@@ -584,7 +555,7 @@ def telegram_webhook():
                 welcome_message = (
                     "👋 Welcome to *ExpenseTrackerBot*! 📊💰\n\n"
                     "To get started, please select your role:\n\n"
-                    "👨‍👩‍👧‍👦 *Are you a Parent or a Dependent?*"
+                    "👨‍👩‍👧‍👦 *Are you a Primary Member or a Dependent?*"
                 )
 
                 keyboard = [
