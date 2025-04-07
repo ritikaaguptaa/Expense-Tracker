@@ -9,7 +9,6 @@ import re
 import time
 from frappe.utils.pdf import get_pdf
 from frappe.utils import now_datetime
-# from expense_tracker.report.expense_summary.expense_summary import execute 
 
 DEEPGRAM_API_KEY = os.getenv("DEEPGRAM_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -1032,7 +1031,7 @@ def generate_and_send_report(chat_id):
     report = frappe.get_doc("Report", "Expense Summary")  # Your report name
     columns, data = report.get_data(filters={"chat_id": chat_id})
 
-    html = frappe.render_template("templates/expense_report_template.html", {
+    html = frappe.render_template("expense_tracker/templates/pages/expense_report_template.html", {
         "columns": columns,
         "data": data,
         "year": current_year
