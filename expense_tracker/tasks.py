@@ -7,6 +7,8 @@ import google.generativeai as genai
 import json
 import re
 import time
+from frappe.utils.pdf import get_pdf
+from frappe.utils import now_datetime
 
 DEEPGRAM_API_KEY = os.getenv("DEEPGRAM_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -472,6 +474,16 @@ def send_telegram_message_with_keyboard(chat_id, message, keyboard):
     except Exception as e:
         frappe.logger().error(f"Error sending Telegram message: {str(e)}")
 
+def send_pdf_to_telegram(chat_id, file_path):
+    url = f"https://api.telegram.org/bot{bot_token}/sendDocument"
+    
+    with open(file_path, "rb") as f:
+        files = {"document": f}
+        data = {"chat_id": chat_id}
+        response = requests.post(url, data=data, files=files)
+    
+    if not response.ok:
+        frappe.log_error(response.text, "Telegram PDF Send Error")
 
 # @frappe.whitelist(allow_guest=True)
 # def telegram_webhook():
@@ -521,7 +533,7 @@ def telegram_webhook():
                 frappe.cache.set_value(f"callback_{chat_id}", callback_data)
                 message = "💸 *Enter the amount you want to request.*"
             elif callback_data == "view_report":
-                message = "📊 *Report Unavailable!* This feature is currently under development. Stay tuned for updates."
+                generate_and_send_report(chat_id)
             if callback_data == "set_monthly_budget":
                 frappe.cache.set_value(f"set_budget_{chat_id}", True)
                 message = """
@@ -1012,6 +1024,28 @@ def store_budget(chat_id, extracted_data):
     except Exception as e:
         frappe.log_error(f"Unexpected error in store_budget: {e}")
         send_telegram_message(chat_id, escape_markdown_v2(f"❌ *Error:* Failed to process budget. {str(e)}"))
+
+def generate_and_send_report(chat_id):
+    current_year = now_datetime().year
+
+    report = frappe.get_doc("Report", "Expense Summary")  # Your report name
+    columns, data = report.get_data(filters={"chat_id": chat_id})
+
+    html = frappe.render_template("templates/expense_report_template.html", {
+        "columns": columns,
+        "data": data,
+        "year": current_year
+    })
+
+    pdf = get_pdf(html)
+
+    file_path = f"/tmp/expense_report_{chat_id}.pdf"
+    with open(file_path, "wb") as f:
+        f.write(pdf)
+
+    send_pdf_to_telegram(chat_id, file_path)
+
+    os.remove(file_path)
 
 def get_telegram_file_url(file_id):
     bot_token = os.getenv("BOT_TOKEN")
