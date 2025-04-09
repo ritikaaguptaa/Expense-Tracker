@@ -6,9 +6,15 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "personal_information_section",
   "full_name",
   "email",
+  "contact_number",
+  "column_break_l1s8",
+  "date_of_birth",
+  "age",
   "telegram_id",
+  "section_break_mqat",
   "salary",
   "default_pocket_money_for_dependents",
   "total_expense"
@@ -57,11 +63,40 @@
    "label": "Default Pocket Money for Dependents",
    "non_negative": 1,
    "reqd": 1
+  },
+  {
+   "fieldname": "contact_number",
+   "fieldtype": "Phone",
+   "label": "Contact Number"
+  },
+  {
+   "fieldname": "column_break_l1s8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "date_of_birth",
+   "fieldtype": "Date",
+   "label": "Date of Birth"
+  },
+  {
+   "fieldname": "age",
+   "fieldtype": "Int",
+   "label": "Age"
+  },
+  {
+   "fieldname": "section_break_mqat",
+   "fieldtype": "Section Break",
+   "label": "Earning & Distribution"
+  },
+  {
+   "fieldname": "personal_information_section",
+   "fieldtype": "Section Break",
+   "label": "Personal Information"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-04-06 11:45:08.114659",
+ "modified": "2025-04-09 07:09:54.877919",
  "modified_by": "Administrator",
  "module": "Expense Tracker",
  "name": "Primary Account",
