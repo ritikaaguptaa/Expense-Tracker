@@ -2,6 +2,8 @@
 # For license information, please see license.txt
 
 import frappe
+import random
+import string
 from frappe.model.document import Document
 from frappe.utils.password import update_password
 
@@ -12,7 +14,7 @@ class PrimaryAccount(Document):
 
     def create_user_with_role(self):
         if not frappe.db.exists("User", self.email):
-            # Create User
+
             user = frappe.get_doc({
                 "doctype": "User",
                 "email": self.email,
@@ -23,8 +25,6 @@ class PrimaryAccount(Document):
             })
             user.insert(ignore_permissions=True)
 
-            update_password(self.email, "expense@1234")
-
     def assign_user_permission(self):
         user_permission = frappe.get_doc({
             "doctype": "User Permission",
@@ -33,8 +33,6 @@ class PrimaryAccount(Document):
             "for_value": self.name,
         })
         user_permission.insert(ignore_permissions=True)
-
-
 
 @frappe.whitelist()
 def send_email_to_dependent(email, name, primary_name, primary_id):
