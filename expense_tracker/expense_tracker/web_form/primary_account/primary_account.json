@@ -21,7 +21,7 @@
  "list_columns": [],
  "login_required": 0,
  "max_attachment_size": 0,
- "modified": "2025-04-09 11:19:18.854910",
+ "modified": "2025-04-10 02:55:22.502486",
  "modified_by": "Administrator",
  "module": "Expense Tracker",
  "name": "primary-account",
@@ -31,7 +31,7 @@
  "show_attachments": 0,
  "show_list": 0,
  "show_sidebar": 0,
- "success_message": "Welcome aboard! You are all set to start tracking expenses, managing budgets, and simplifying money management for you and your dependents.\nTo record expenses using voice, connect with our Telegram bot below. You can now log in and explore your dashboard.\n\n",
+ "success_message": "Welcome aboard! You are all set to start tracking expenses, managing budgets, and simplifying money management for you and your dependents.\n",
  "success_title": "Account Created Successfully",
  "title": "Set Up Your Expense Manager Account",
  "web_form_fields": [
