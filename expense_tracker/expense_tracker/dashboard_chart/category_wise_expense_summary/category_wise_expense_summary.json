@@ -1,0 +1,33 @@
+{
+ "chart_name": "Category-wise Expense Summary",
+ "chart_type": "Report",
+ "creation": "2025-04-10 22:01:22.458945",
+ "currency": "INR",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart",
+ "dynamic_filters_json": "{}",
+ "filters_json": "{}",
+ "group_by_type": "Count",
+ "idx": 0,
+ "is_public": 0,
+ "is_standard": 1,
+ "modified": "2025-04-10 22:01:22.458945",
+ "modified_by": "Administrator",
+ "module": "Expense Tracker",
+ "name": "Category-wise Expense Summary",
+ "number_of_groups": 0,
+ "owner": "Administrator",
+ "report_name": "Category-wise Expense Summary",
+ "roles": [],
+ "time_interval": "Yearly",
+ "timeseries": 0,
+ "timespan": "Last Year",
+ "type": "Bar",
+ "use_report_chart": 0,
+ "x_field": "category",
+ "y_axis": [
+  {
+   "y_field": "total_amount_(\u20b9)"
+  }
+ ]
+}

@@ -1,0 +1,50 @@
+{
+ "cards": [
+  {
+   "card": "\ud83d\udc64 Total Registered Users"
+  },
+  {
+   "card": "\ud83d\udc64 Total Members"
+  },
+  {
+   "card": "Today\u2019s Active Users"
+  },
+  {
+   "card": "\ud83e\uddfe Total Tracked Expenses"
+  }
+ ],
+ "charts": [
+  {
+   "chart": "Spending Insights",
+   "width": "Full"
+  },
+  {
+   "chart": "User Growth by Day",
+   "width": "Full"
+  },
+  {
+   "chart": "Daily Active Users",
+   "width": "Full"
+  },
+  {
+   "chart": "Month Wise Expenses",
+   "width": "Half"
+  },
+  {
+   "chart": "Category-wise Expense Summary",
+   "width": "Half"
+  }
+ ],
+ "creation": "2025-04-09 12:33:00.652445",
+ "dashboard_name": "InsightHQ",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "modified": "2025-04-10 23:05:45.313637",
+ "modified_by": "Administrator",
+ "module": "Expense Tracker",
+ "name": "InsightHQ",
+ "owner": "Administrator"
+}
