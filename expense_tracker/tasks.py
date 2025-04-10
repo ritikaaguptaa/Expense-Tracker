@@ -93,22 +93,6 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 #         print(message)  # Debugging
 #         send_telegram_message(chat_id, message)
 
-
-def get_audio_file_path():
-    """Fetch the latest uploaded audio file path from File Doctype."""
-    file_doc = frappe.get_list(
-        "File", filters={"file_url": "/files/food.mp4"}, fields=["file_url"], limit=1
-    )
-
-    if file_doc:
-        file_url = file_doc[0]["file_url"]  # "/files/food.mp4"
-        site_path = frappe.get_site_path(
-            "public", file_url.lstrip("/")
-        )  # Convert to absolute path
-        return site_path
-    return None
-
-
 async def transcribe_audio_async(file_url, chat_id):
     """Asynchronous function to transcribe audio using Deepgram API."""
     try:
@@ -202,17 +186,17 @@ def process_and_notify(file_url, chat_id):
     return transcribe_audio(file_url, chat_id)
 
 
-# def escape_markdown_v2(text):
-#     """Escapes special characters for Telegram MarkdownV2."""
-#     if text is None:
-#         return "Unknown"  # Ensure None values are converted to safe text
-
-#     escape_chars = r"_*[]()~`>#+-=|{}.!"
-#     return re.sub(
-#         r"([" + re.escape(escape_chars) + r"])", r"\\\1", str(text)
-#     )  # Ensure conversion to string
-
 def escape_markdown_v2(text):
+    """Escapes special characters for Telegram MarkdownV2."""
+    if text is None:
+        return "Unknown"  # Ensure None values are converted to safe text
+
+    escape_chars = r"_*[]()~`>#+-=|{}.!"
+    return re.sub(
+        r"([" + re.escape(escape_chars) + r"])", r"\\\1", str(text)
+    )  # Ensure conversion to string
+
+def es_markdown_v2(text):
     escape_chars = r'_*[]()~`>#+-=|{}.!'
     return ''.join('\\' + char if char in escape_chars else char for char in text)
 
@@ -249,8 +233,8 @@ def extract_and_notify(text, escaped_transcript, chat_id):
                         family_message = f"⚠️ *Restricted Category!* Your transaction under '{category}' is not permitted."
                         parent_message = f"📢 *Expense Alert!* {family_member_doc.full_name} attempted a transaction in the '{category}' category, which is not part of the permitted expenses."
 
-                        family_escaped_message = family_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
-                        parent_escaped_message = parent_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
+                        family_escaped_message = family_message.replace(".", "\\.").replace("!", "\\!").replace("_", "\\_")
+                        parent_escaped_message = parent_message.replace(".", "\\.").replace("!", "\\!").replace("_", "\\_")
 
                         send_telegram_message(chat_id, family_escaped_message)
                         send_telegram_message(primary_account_doc.telegram_id, parent_escaped_message)
@@ -283,7 +267,7 @@ def extract_and_notify(text, escaped_transcript, chat_id):
 
                     if category not in allowed_categories:
                         warning_message = f"⚠️ *Unrecognized Category!* The category '{category}' is not listed under your approved expense categories."
-                        escaped_message = warning_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
+                        escaped_message = warning_message.replace(".", "\\.").replace("!", "\\!").replace("_", "\\_")
                         send_telegram_message(chat_id, escaped_message)
                         return
                     else:
@@ -551,7 +535,6 @@ def telegram_webhook():
             escaped_message = (
                 message.replace(".", "\\.")
                 .replace("!", "\\!")
-                .replace("*", "\\*")
                 .replace("_", "\\_")
             )
             send_telegram_message(chat_id, escaped_message)
@@ -578,7 +561,6 @@ def telegram_webhook():
                 escaped_message = (
                     welcome_message.replace(".", "\\.")
                     .replace("!", "\\!")
-                    .replace("*", "\\*")
                     .replace("_", "\\_")
                 )
                 send_telegram_message_with_keyboard(chat_id, escaped_message, keyboard)
@@ -655,7 +637,6 @@ def telegram_webhook():
                     escaped_ai_response = (
                         ai_response.replace(".", "\\.")
                         .replace("!", "\\!")
-                        .replace("*", "\\*")
                         .replace("_", "\\_")
                     )
 
@@ -669,18 +650,32 @@ def telegram_webhook():
                             escaped_message = (
                                 message.replace(".", "\\.")
                                 .replace("!", "\\!")
-                                .replace("*", "\\*")
                                 .replace("_", "\\_")
                             )
                             send_telegram_message(chat_id, escaped_message)
                             return {"ok": False, "error": "Invalid Parent ID"}
 
                         if user_role == "role_parent":
-                            message = "🎉 *You are verified as a Parent!* Now, track your expenses daily! 💳"
+                            message = """
+                                👋 You're now verified as the *Primary Account Holder*.
+
+                                Here’s what you can do directly from Telegram:
+
+                                🔹 *Log Expenses Instantly* using voice commands  
+                                🔹 *Check Your Balance* and *Add Money* seamlessly  
+                                🔹 *Receive Weekly Summaries* of your spending  
+                                🔹 *Set Monthly Budgets* by category via voice  
+                                🔹 *Get Notified* if a dependent tries to log expenses in unapproved categories  
+
+                                To explore complete insights, manage your dependents, and configure categories:  
+                                🌐 [Access Your Dashboard](https://two-korecent.frappe.cloud/)
+
+                                Stay in control — effortlessly.
+                            """
+
                             escaped_message = (
                                 message.replace(".", "\\.")
                                 .replace("!", "\\!")
-                                .replace("*", "\\*")
                                 .replace("_", "\\_")
                             )
 
@@ -694,11 +689,23 @@ def telegram_webhook():
 
                         elif user_role == "role_dependent":
                             if frappe.db.exists("Family Member", {"telegram_id": chat_id}):
-                                message = "✅ *You're already registered!* Start tracking your expenses now. 📊"
+                                message = """
+                                    👋 You’re now verified as a *Dependent User*.
+
+                                    Here’s what you can do directly from Telegram:
+
+                                    🔹 *Add Your Expenses* using voice commands  
+                                    🔹 *View Your Expense History* anytime  
+                                    🔹 *Receive Weekly Reports* of your spending  
+                                    🔹 *Get Reminders* to stay within your budget limits  
+                                    🔹 *Be Notified* if an expense is blocked due to category restrictions
+
+                                    Stay on top of your spending — all within Telegram.
+                                """
+
                                 escaped_message = (
                                     message.replace(".", "\\.")
                                     .replace("!", "\\!")
-                                    .replace("*", "\\*")
                                     .replace("_", "\\_")
                                 )
                                 send_telegram_message(chat_id, escaped_message)
@@ -709,7 +716,6 @@ def telegram_webhook():
                                     escaped_message = (
                                         message.replace(".", "\\.")
                                         .replace("!", "\\!")
-                                        .replace("*", "\\*")
                                         .replace("_", "\\_")
                                     )
                                     send_telegram_message(chat_id, escaped_message)
@@ -738,7 +744,6 @@ def telegram_webhook():
                                 escaped_message = (
                                     message.replace(".", "\\.")
                                     .replace("!", "\\!")
-                                    .replace("*", "\\*")
                                     .replace("_", "\\_")
                                 )
                                 send_telegram_message(chat_id, escaped_message)
@@ -761,8 +766,9 @@ def telegram_webhook():
 
                         else:
                             message = "⚠️ *Invalid amount.* Please enter a valid number."
+                            return {"ok": False, "error": "Invalid amount"}
 
-                        escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
+                        escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("_", "\\_")
                         send_telegram_message(chat_id, escaped_message)
 
                     elif user_role == "request_money":
@@ -773,7 +779,7 @@ def telegram_webhook():
                                 family_member_doc = frappe.get_doc("Family Member", {"telegram_id": chat_id})
                             except frappe.DoesNotExistError:
                                 warning_message = "❌ *Error:* You are not registered as a family member."
-                                escaped_message = warning_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
+                                escaped_message = warning_message.replace(".", "\\.").replace("!", "\\!").replace("_", "\\_")
                                 send_telegram_message(chat_id, escaped_message)
                                 return {"ok": False, "error": "Family Member not found"}
 
@@ -781,13 +787,13 @@ def telegram_webhook():
                                 primary_account_doc = frappe.get_doc("Primary Account", family_member_doc.primary_account_holder)
                             except frappe.DoesNotExistError:
                                 warning_message = "❌ *Error:* Your parent account does not exist."
-                                escaped_message = warning_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
+                                escaped_message = warning_message.replace(".", "\\.").replace("!", "\\!").replace("_", "\\_")
                                 send_telegram_message(chat_id, escaped_message)
                                 return {"ok": False, "error": "Parent Account not found"}
 
                             if not primary_account_doc.telegram_id:
                                 warning_message = "❌ *Error:* Parent Telegram ID is missing."
-                                escaped_message = warning_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
+                                escaped_message = warning_message.replace(".", "\\.").replace("!", "\\!").replace("_", "\\_")
                                 send_telegram_message(chat_id, escaped_message)
                                 return {"ok": False, "error": "Parent Telegram ID missing"}
 
@@ -796,12 +802,12 @@ def telegram_webhook():
 
                             # Notify dependent
                             success_message = f"⏳ *Request Sent!* ₹{amount} has been requested from your parent.\nWe will notify you once they respond. ✅"
-                            escaped_message = success_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
+                            escaped_message = success_message.replace(".", "\\.").replace("!", "\\!").replace("_", "\\_")
                             send_telegram_message(chat_id, escaped_message)
 
                             # Notify parent with options
                             parent_message = f"📢 *Money Request Alert!*\nYour dependent *{family_member_doc.full_name}* has requested ₹{amount}.\nWould you like to approve it?"
-                            parent_escaped_message = parent_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
+                            parent_escaped_message = parent_message.replace(".", "\\.").replace("!", "\\!").replace("_", "\\_")
 
                             keyboard = [
                                 [{"text": "✅ Approve", "callback_data": "approve"}],
@@ -812,7 +818,7 @@ def telegram_webhook():
 
                         else:
                             warning_message = "⚠️ *Invalid amount.* Please enter a valid number."
-                            escaped_message = warning_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
+                            escaped_message = warning_message.replace(".", "\\.").replace("!", "\\!").replace("_", "\\_")
                             send_telegram_message(chat_id, escaped_message)
                             return {"ok": False, "error": "Invalid Amount"}
 
@@ -862,8 +868,8 @@ def approve_money_request(parent_chat_id):
         parent_message = f"✅ *Request Approved!*\n₹{amount} has been transferred to {family_member_doc.full_name}."
         dependent_message = f"🎉 *Request Approved!*\nYour parent sent you ₹{amount}. Check your pocket money! 💰"
 
-        parent_escaped_message = parent_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
-        dependent_escaped_message = dependent_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
+        parent_escaped_message = parent_message.replace(".", "\\.").replace("!", "\\!").replace("_", "\\_")
+        dependent_escaped_message = dependent_message.replace(".", "\\.").replace("!", "\\!").replace("_", "\\_")
 
         keyboard = [
             [{"text": "💰 Check Balance", "callback_data": "check_balance"}]
@@ -896,8 +902,8 @@ def deny_money_request(parent_chat_id):
     parent_message = "❌ *Request Denied!* You rejected the money request."
     dependent_message = "❌ *Request Denied!* Your parent rejected your request for money."
 
-    parent_escaped_message = parent_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
-    dependent_escaped_message = dependent_message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
+    parent_escaped_message = parent_message.replace(".", "\\.").replace("!", "\\!").replace("_", "\\_")
+    dependent_escaped_message = dependent_message.replace(".", "\\.").replace("!", "\\!").replace("_", "\\_")
 
     send_telegram_message(parent_chat_id, parent_escaped_message)
     send_telegram_message(dependent_chat_id, dependent_escaped_message)
@@ -919,9 +925,11 @@ async def transcribe_voice_note(file_url):
 
 def transcribe_voice_note_sync_wrapper(file_url):
     return asyncio.run(transcribe_voice_note(file_url))
+
 @frappe.whitelist()
 def process_budget_transcription(chat_id, transcript):
-    send_telegram_message(chat_id, escape_markdown_v2("🔄 *Processing your budget...* This may take a few moments."))
+    send_telegram_message(chat_id, es_markdown_v2("⏳ *Hold Tight\\!* We're analyzing your voice command and preparing your budget summary\\. \n\n"
+        "This will only take a moment\\. 💡"))
 
     prompt = f"""
 You are a highly accurate text parser. Extract the budget categories and their corresponding amounts from the following user input. Return the result as a **single JSON object**. The keys of the JSON object should be the budget categories, and the values should be the amounts as integers.
@@ -950,19 +958,23 @@ Ensure that the output is strictly a valid JSON object and nothing else. If no b
             try:
                 details = json.loads(cleaned_json)
             except json.JSONDecodeError as e:
-                send_telegram_message(chat_id, escape_markdown_v2("❌ *Error:* Couldn't understand your budget. Try again with clear categories and amounts."))
+                send_telegram_message(chat_id, es_markdown_v2("❌ *Error:* Couldn't understand your budget. Try again with clear categories and amounts."))
                 return
-
+        
+        time.sleep(4)
         store_budget(chat_id, details)
 
     except Exception as e:
         frappe.log_error(f"Error during Gemini processing: {e}", "Budget Transcription")
-        send_telegram_message(chat_id, escape_markdown_v2("❌ *Error:* There was an issue processing your request. Please try again later."))
+        send_telegram_message(chat_id, es_markdown_v2("❌ *Error:* There was an issue processing your request. Please try again later."))
 
 
 @frappe.whitelist()
 def store_budget(chat_id, extracted_data):
-    send_telegram_message(chat_id, escape_markdown_v2("💾 *Storing your budget data...* Please wait."))
+    send_telegram_message(chat_id, es_markdown_v2("📊 *Processing your voice command\\.*\n\n"
+        "Setting up your budgets — just a moment\\. 🚀"))
+    
+    time.sleep(2)
 
     try:
         primary_account_name = frappe.db.get_value("Primary Account", {"telegram_id": chat_id}, "name")
@@ -990,11 +1002,11 @@ def store_budget(chat_id, extracted_data):
                         int(amount),
                         update_modified=True,
                     )
-                    updated_categories.append(f"✅ *{escape_markdown_v2(category)}:* ₹{amount}")
+                    updated_categories.append(f"🔹 *{es_markdown_v2(category)}:* ₹{amount}")
                 except Exception as e:
                     frappe.log_error(f"Error updating budget for {category}: {e}", "Budget Storage")
             else:
-                non_updated_categories.append(f"❌ *{escape_markdown_v2(category)}*")
+                non_updated_categories.append(f"🔹 *{es_markdown_v2(category)}*")
 
         try:
             frappe.db.commit()
@@ -1010,7 +1022,7 @@ def store_budget(chat_id, extracted_data):
                 + "\n".join(updated_categories) +
                 "\n\n🔹 *You can now track your expenses effectively!* 🚀"
             )
-            send_telegram_message(chat_id, escape_markdown_v2(message))
+            send_telegram_message(chat_id, es_markdown_v2(message))
 
         if non_updated_categories:
             message = (
@@ -1019,11 +1031,11 @@ def store_budget(chat_id, extracted_data):
                 + "\n".join(non_updated_categories) +
                 "\n\n🔹 *Please add them first before setting a budget.*"
             )
-            send_telegram_message(chat_id, escape_markdown_v2(message))
+            send_telegram_message(chat_id, es_markdown_v2(message))
 
     except Exception as e:
         frappe.log_error(f"Unexpected error in store_budget: {e}")
-        send_telegram_message(chat_id, escape_markdown_v2(f"❌ *Error:* Failed to process budget. {str(e)}"))
+        send_telegram_message(chat_id, es_markdown_v2(f"❌ *Error:* Failed to process budget. {str(e)}"))
 
 def generate_and_send_report(chat_id):
     try:
