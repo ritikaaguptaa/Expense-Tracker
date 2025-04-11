@@ -7,6 +7,7 @@ import google.generativeai as genai
 import json
 import re
 import time
+import textwrap
 from frappe.utils.pdf import get_pdf
 from frappe.utils import now_datetime
 
@@ -521,10 +522,15 @@ def telegram_webhook():
             if callback_data == "set_monthly_budget":
                 frappe.cache.set_value(f"set_budget_{chat_id}", True)
                 message = """
-            🎙️ *Send a voice note describing your budget for each category!*  
-            For example:  
-            "_Food ₹5000, Travel ₹3000, Shopping ₹2000_"  
-            """
+🎙️ *Set your monthly category budgets using a voice message!*  
+Just speak naturally — for example:  
+"_Set Food to ₹5000, Travel ₹3000, and Shopping ₹2000_"  
+or  
+"_Food ₹5000, Travel ₹3000, Shopping ₹2000_"
+
+We'll automatically update your budgets accordingly ✅
+"""
+
             elif callback_data == "approve":
                 approve_money_request(chat_id)
                 return {"ok": True}
@@ -656,7 +662,7 @@ def telegram_webhook():
                             return {"ok": False, "error": "Invalid Parent ID"}
 
                         if user_role == "role_parent":
-                            message = """
+                            message = textwrap.dedent("""
                                 👋 You're now verified as the *Primary Account Holder*.
 
                                 Here’s what you can do directly from Telegram:
@@ -671,7 +677,7 @@ def telegram_webhook():
                                 🌐 [Access Your Dashboard](https://two-korecent.frappe.cloud/)
 
                                 Stay in control — effortlessly.
-                            """
+                            """)
 
                             escaped_message = (
                                 message.replace(".", "\\.")
@@ -689,7 +695,7 @@ def telegram_webhook():
 
                         elif user_role == "role_dependent":
                             if frappe.db.exists("Family Member", {"telegram_id": chat_id}):
-                                message = """
+                                message = textwrap.dedent("""
                                     👋 You’re now verified as a *Dependent User*.
 
                                     Here’s what you can do directly from Telegram:
@@ -701,7 +707,7 @@ def telegram_webhook():
                                     🔹 *Be Notified* if an expense is blocked due to category restrictions
 
                                     Stay on top of your spending — all within Telegram.
-                                """
+                                """)
 
                                 escaped_message = (
                                     message.replace(".", "\\.")
@@ -928,8 +934,7 @@ def transcribe_voice_note_sync_wrapper(file_url):
 
 @frappe.whitelist()
 def process_budget_transcription(chat_id, transcript):
-    send_telegram_message(chat_id, es_markdown_v2("⏳ *Hold Tight\\!* We're analyzing your voice command and preparing your budget summary\\. \n\n"
-        "This will only take a moment\\. 💡"))
+    send_telegram_message(chat_id, es_markdown_v2("⏳ *Hold Tight\\!* We're analyzing your voice command and preparing your budget summary\\. \n\n This will only take a moment\\. 💡"))
 
     prompt = f"""
 You are a highly accurate text parser. Extract the budget categories and their corresponding amounts from the following user input. Return the result as a **single JSON object**. The keys of the JSON object should be the budget categories, and the values should be the amounts as integers.
@@ -971,8 +976,7 @@ Ensure that the output is strictly a valid JSON object and nothing else. If no b
 
 @frappe.whitelist()
 def store_budget(chat_id, extracted_data):
-    send_telegram_message(chat_id, es_markdown_v2("📊 *Processing your voice command\\.*\n\n"
-        "Setting up your budgets — just a moment\\. 🚀"))
+    send_telegram_message(chat_id, es_markdown_v2("📊 *Processing your voice command\\.*\n\n Setting up your budgets — just a moment\\. 🚀"))
     
     time.sleep(2)
 
@@ -1020,7 +1024,7 @@ def store_budget(chat_id, extracted_data):
                 "📊 *Budget Updated Successfully!* 💰\n\n"
                 "Your budget has been set for the following categories:\n\n"
                 + "\n".join(updated_categories) +
-                "\n\n🔹 *You can now track your expenses effectively!* 🚀"
+                "\n\n*You can now track your expenses effectively!* 🚀"
             )
             send_telegram_message(chat_id, es_markdown_v2(message))
 
@@ -1029,7 +1033,7 @@ def store_budget(chat_id, extracted_data):
                 "⚠️ *Some Categories Were Not Updated* ❌\n\n"
                 "The following categories do not exist in your account:\n\n"
                 + "\n".join(non_updated_categories) +
-                "\n\n🔹 *Please add them first before setting a budget.*"
+                "\n\n*Please add them first before setting a budget.*"
             )
             send_telegram_message(chat_id, es_markdown_v2(message))
 
