@@ -934,7 +934,12 @@ def transcribe_voice_note_sync_wrapper(file_url):
 
 @frappe.whitelist()
 def process_budget_transcription(chat_id, transcript):
-    send_telegram_message(chat_id, es_markdown_v2("⏳ *Hold Tight\\!* We're analyzing your voice command and preparing your budget summary\\. \n\n This will only take a moment\\. 💡"))
+    message1 = (
+    "📊 *Processing your voice command...*\n\n"
+    "Setting up your budgets — just a moment. 🚀"
+)
+    
+    send_telegram_message(chat_id, es_markdown_v2(message1))
 
     prompt = f"""
 You are a highly accurate text parser. Extract the budget categories and their corresponding amounts from the following user input. Return the result as a **single JSON object**. The keys of the JSON object should be the budget categories, and the values should be the amounts as integers.
@@ -976,7 +981,11 @@ Ensure that the output is strictly a valid JSON object and nothing else. If no b
 
 @frappe.whitelist()
 def store_budget(chat_id, extracted_data):
-    send_telegram_message(chat_id, es_markdown_v2("📊 *Processing your voice command\\.*\n\n Setting up your budgets — just a moment\\. 🚀"))
+    message2 = (
+    "📊 *Processing your voice command...*\n\n"
+    "Setting up your budgets — just a moment. 🚀"
+)
+    send_telegram_message(chat_id, es_markdown_v2(message2))
     
     time.sleep(2)
 
