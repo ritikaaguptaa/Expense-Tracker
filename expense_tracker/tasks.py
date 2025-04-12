@@ -192,13 +192,13 @@ def escape_markdown_v2(text):
     if text is None:
         return "Unknown"  # Ensure None values are converted to safe text
 
-    escape_chars = r"_*[]()~`>#+-=|{}.!"
+    escape_chars = r"_[]()~`>#+-=|{}.!"
     return re.sub(
         r"([" + re.escape(escape_chars) + r"])", r"\\\1", str(text)
     )  # Ensure conversion to string
 
 def es_markdown_v2(text):
-    escape_chars = r'_*[]()~`>#+-=|{}.!'
+    escape_chars = r'_[]()~`>#+-=|{}.!'
     return ''.join('\\' + char if char in escape_chars else char for char in text)
 
 def extract_and_notify(text, escaped_transcript, chat_id):
@@ -935,10 +935,10 @@ def transcribe_voice_note_sync_wrapper(file_url):
 @frappe.whitelist()
 def process_budget_transcription(chat_id, transcript):
     message1 = (
-    "📊 *Processing your voice command...*\n\n"
-    "Setting up your budgets — just a moment. 🚀"
+    "⏳ *Hold Tight\\!* We're analyzing your voice command and preparing your budget summary\\.\n\n"
+    "This will only take a moment\\. 💡"
 )
-    
+
     send_telegram_message(chat_id, es_markdown_v2(message1))
 
     prompt = f"""
