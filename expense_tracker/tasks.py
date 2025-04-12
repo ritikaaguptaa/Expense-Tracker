@@ -190,7 +190,7 @@ def process_and_notify(file_url, chat_id):
 def escape_markdown_v2(text):
     """Escapes special characters for Telegram MarkdownV2."""
     if text is None:
-        return "Unknown"  # Ensure None values are converted to safe text
+        return "Unknown"  
 
     escape_chars = r"_[]()~`>#+-=|{}.!"
     return re.sub(
@@ -328,9 +328,17 @@ def extract_and_notify(text, escaped_transcript, chat_id):
 """
 
             try:
+                if is_primary:
+                    account_doc = frappe.get_doc("Primary Account", {"telegram_id": chat_id})
+                    account_name = account_doc.name
+                elif is_family:
+                    account_doc = frappe.get_doc("Family Member", {"telegram_id": chat_id})
+                    account_name = account_doc.name
+
                 expense = frappe.get_doc(
                     {
                         "doctype": "Expense",
+                        "account_holder": account_name,
                         "user_id": chat_id,
                         "amount": extracted_details.get("amount", 0.0),
                         "category": category,
@@ -935,8 +943,8 @@ def transcribe_voice_note_sync_wrapper(file_url):
 @frappe.whitelist()
 def process_budget_transcription(chat_id, transcript):
     message1 = (
-    "⏳ *Hold Tight\\\\!* We're analyzing your voice command and preparing your budget summary\\.\n\n"
-    "This will only take a moment\\. 💡"
+    "⏳ *Hold Tight!* We're analyzing your voice command and preparing your budget summary.\n\n"
+    "This will only take a moment. 💡"
 )
 
     send_telegram_message(chat_id, es_markdown_v2(message1))
