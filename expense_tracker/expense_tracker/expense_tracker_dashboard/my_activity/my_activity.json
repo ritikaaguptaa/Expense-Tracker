@@ -1,0 +1,40 @@
+{
+ "cards": [
+  {
+   "card": "Avaliable Balance"
+  },
+  {
+   "card": "Total Dependents"
+  }
+ ],
+ "charts": [
+  {
+   "chart": "Spending Analysis",
+   "width": "Full"
+  },
+  {
+   "chart": "Day to Day Expenses",
+   "width": "Full"
+  },
+  {
+   "chart": "Expense Breakdown by Category",
+   "width": "Half"
+  },
+  {
+   "chart": "Dependent Financial Overview",
+   "width": "Half"
+  }
+ ],
+ "creation": "2025-04-13 00:24:16.308872",
+ "dashboard_name": "My Activity",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "modified": "2025-04-13 01:43:29.493094",
+ "modified_by": "Administrator",
+ "module": "Expense Tracker",
+ "name": "My Activity",
+ "owner": "Administrator"
+}
