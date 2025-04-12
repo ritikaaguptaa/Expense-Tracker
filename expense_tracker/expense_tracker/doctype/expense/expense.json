@@ -6,6 +6,7 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "account_holder",
   "user_id",
   "amount",
   "category",
@@ -22,7 +23,6 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "User Id",
-   "options": "Primary Account",
    "reqd": 1
   },
   {
@@ -82,12 +82,18 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "account_holder",
+   "fieldtype": "Link",
+   "label": "Account Holder",
+   "options": "Primary Account"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-04-09 13:07:44.546982",
+ "modified": "2025-04-13 00:16:03.728055",
  "modified_by": "Administrator",
  "module": "Expense Tracker",
  "name": "Expense",
