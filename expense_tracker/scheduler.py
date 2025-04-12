@@ -1,5 +1,6 @@
 import re
 import frappe
+import textwrap
 from datetime import datetime, timedelta
 from expense_tracker.tasks import send_telegram_message_with_keyboard, send_telegram_message
 
@@ -49,7 +50,7 @@ def monthly_add_money_reminder():
             frappe.logger().warning(f"Skipping user {full_name} due to missing Telegram ID")
             continue
 
-        message = f"""
+        message = textwrap.dedent(f"""
         🔔 *Monthly Budget Reminder* 🔔  
 
         Hello {full_name},  
@@ -57,7 +58,7 @@ def monthly_add_money_reminder():
         Please ensure your budget is updated to manage your expenses smoothly.  
 
         ➕ Tap below to set your budget for this month! 👇
-        """
+        """)
         escaped_message = escape_markdown_v2(message)
 
         keyboard = [
