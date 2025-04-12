@@ -935,7 +935,7 @@ def transcribe_voice_note_sync_wrapper(file_url):
 @frappe.whitelist()
 def process_budget_transcription(chat_id, transcript):
     message1 = (
-    "⏳ *Hold Tight\\!* We're analyzing your voice command and preparing your budget summary\\.\n\n"
+    "⏳ *Hold Tight\\\\!* We're analyzing your voice command and preparing your budget summary\\.\n\n"
     "This will only take a moment\\. 💡"
 )
 
