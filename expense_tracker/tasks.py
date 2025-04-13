@@ -586,7 +586,7 @@ We'll automatically update your budgets accordingly ✅
 
                     transcript = transcribe_voice_note_sync_wrapper(file_url)
                     process_budget_transcription(chat_id, transcript)
-
+                    frappe.cache.delete_value(f"set_budget_{chat_id}")
                     return
 
                 primary_exist = frappe.db.exists(

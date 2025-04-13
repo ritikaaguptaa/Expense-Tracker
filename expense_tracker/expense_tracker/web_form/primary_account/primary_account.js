@@ -15,4 +15,14 @@ frappe.ready(function () {
 
 		frappe.web_form.set_value('age', age);
     });
+
+    function updateFullName() {
+        const first_name = frappe.web_form.get_value('first_name') || '';
+        const last_name = frappe.web_form.get_value('last_name') || '';
+        const full_name = `${first_name} ${last_name}`.trim();
+        frappe.web_form.set_value('full_name', full_name);
+    }
+
+    frappe.web_form.on('first_name', updateFullName);
+    frappe.web_form.on('last_name', updateFullName);
 });

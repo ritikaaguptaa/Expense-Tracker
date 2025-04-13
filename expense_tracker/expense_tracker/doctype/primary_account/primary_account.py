@@ -18,8 +18,8 @@ class PrimaryAccount(Document):
             user = frappe.get_doc({
                 "doctype": "User",
                 "email": self.email,
-                "first_name": self.full_name,
-                "last_name": self.full_name,
+                "first_name": self.first_name,
+                "last_name": self.last_name,
                 "roles": [{"role": "Expense Manager"}],
                 "user_type": "System User"
             })

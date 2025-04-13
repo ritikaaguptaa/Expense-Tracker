@@ -21,7 +21,7 @@
  "list_columns": [],
  "login_required": 0,
  "max_attachment_size": 0,
- "modified": "2025-04-10 02:55:22.502486",
+ "modified": "2025-04-13 08:56:10.787528",
  "modified_by": "Administrator",
  "module": "Expense Tracker",
  "name": "primary-account",
@@ -50,6 +50,20 @@
   },
   {
    "allow_read_on_all_link_options": 0,
+   "fieldname": "first_name",
+   "fieldtype": "Data",
+   "hidden": 0,
+   "label": "First Name",
+   "max_length": 0,
+   "max_value": 0,
+   "precision": "",
+   "read_only": 0,
+   "reqd": 1,
+   "show_in_filter": 0
+  },
+  {
+   "allow_read_on_all_link_options": 0,
+   "depends_on": "eval:doc.first_name && doc.last_name",
    "fieldname": "full_name",
    "fieldtype": "Data",
    "hidden": 0,
@@ -57,8 +71,8 @@
    "max_length": 0,
    "max_value": 0,
    "precision": "",
-   "read_only": 0,
-   "reqd": 1,
+   "read_only": 1,
+   "reqd": 0,
    "show_in_filter": 0
   },
   {
@@ -98,6 +112,19 @@
    "precision": "",
    "read_only": 0,
    "reqd": 0,
+   "show_in_filter": 0
+  },
+  {
+   "allow_read_on_all_link_options": 0,
+   "fieldname": "last_name",
+   "fieldtype": "Data",
+   "hidden": 0,
+   "label": "Last Name",
+   "max_length": 0,
+   "max_value": 0,
+   "precision": "",
+   "read_only": 0,
+   "reqd": 1,
    "show_in_filter": 0
   },
   {
