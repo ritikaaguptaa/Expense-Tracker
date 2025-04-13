@@ -34,7 +34,7 @@ from expense_tracker.tasks import send_telegram_message_with_keyboard, send_tele
 #     frappe.logger().info("Monthly Budget Reminder completed.")
 #     return {"status": "success", "message": "Reminders sent to all users."}
 
-def escape_markdown_v2(text):
+def es_markdown_v2(text):
     escape_chars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!']
     return "".join(f"\\{char}" if char in escape_chars else char for char in text)
 
@@ -59,7 +59,7 @@ def monthly_add_money_reminder():
 
         ➕ Tap below to set your budget for this month! 👇
         """)
-        escaped_message = escape_markdown_v2(message)
+        escaped_message = es_markdown_v2(message)
 
         keyboard = [
             [{"text": "📊 Set Monthly Budget", "callback_data": "set_monthly_budget"}]
@@ -95,11 +95,11 @@ def send_weekly_parent_spending_summary():
             if not expenses:
                 continue
 
-            spending_details = "\n".join([f"📌 *{escape_markdown_v2(expense['category'])}*: ₹{expense['total_spent']}" for expense in expenses])
+            spending_details = "\n".join([f"📌 *{es_markdown_v2(expense['category'])}*: ₹{expense['total_spent']}" for expense in expenses])
 
             message = f"""
 📊 *Weekly Spending Summary* 📅
-🔹 *Period:* {escape_markdown_v2(last_week_start_india.strftime('%d %b %Y'))} - {escape_markdown_v2(last_week_end_india.strftime('%d %b %Y'))}
+🔹 *Period:* {es_markdown_v2(last_week_start_india.strftime('%d %b %Y'))} - {es_markdown_v2(last_week_end_india.strftime('%d %b %Y'))}
 
 💰 *Here's what you spent in each category:*
 {spending_details}
@@ -107,7 +107,7 @@ def send_weekly_parent_spending_summary():
 🔹 *Keep track and plan ahead for next week!* 🚀
             """
 
-            escaped_message = escape_markdown_v2(message)
+            escaped_message = es_markdown_v2(message)
 
             try:
                 send_telegram_message(chat_id, escaped_message)
@@ -147,18 +147,18 @@ def send_weekly_family_spending_summary():
             if not expenses:
                 continue
 
-            spending_details = "\n".join([f"📌 *{escape_markdown_v2(expense['category'])}*: ₹{expense['total_spent']}" for expense in expenses])
+            spending_details = "\n".join([f"📌 *{es_markdown_v2(expense['category'])}*: ₹{expense['total_spent']}" for expense in expenses])
 
             message = f"""
 👨‍👩‍👦 *Weekly Spending Summary* 🧾
-👤 *User:* {escape_markdown_v2(member_name) if member_name else 'N/A'}
-🔹 *Period:* {escape_markdown_v2(last_week_start_india.strftime('%d %b %Y'))} - {escape_markdown_v2(last_week_end_india.strftime('%d %b %Y'))}
+👤 *User:* {es_markdown_v2(member_name) if member_name else 'N/A'}
+🔹 *Period:* {es_markdown_v2(last_week_start_india.strftime('%d %b %Y'))} - {es_markdown_v2(last_week_end_india.strftime('%d %b %Y'))}
 
 💰 *Here's what you spent in each category:*
 {spending_details}
             """
 
-            escaped_message = escape_markdown_v2(message)
+            escaped_message = es_markdown_v2(message)
 
             try:
                 send_telegram_message(chat_id, escaped_message)
@@ -261,3 +261,38 @@ def notify_dependents_about_savings():
 
     frappe.logger().info("Savings Notification completed.")
     return {"status": "success", "message": "Savings notifications sent to all dependents."}
+
+def budget_health_checker():
+    low_threshold = 500  
+    critical_threshold = 100 
+
+    categories = frappe.get_all("Expense Category", fields=["name", "budget", "associated_account_holder"])
+
+    for category in categories:
+        remaining = category.budget or 0
+
+        if remaining > low_threshold:
+            continue  
+
+        telegram_id = frappe.db.get_value("Primary Account", category.associated_account_holder, "telegram_id")
+        if not telegram_id:
+            continue
+
+        level = "critical" if remaining <= critical_threshold else "warning"
+        message = get_alert_message(category.name, remaining, level).replace(".", "\\.").replace("!", "\\!")
+
+        send_telegram_message(telegram_id, message)
+
+
+def get_alert_message(category_name, remaining, level):
+    emoji = "🚨" if level == "critical" else "⚠️"
+    title = "Budget Critically Low!" if level == "critical" else "Budget Running Low"
+
+    return f"""
+*{emoji} {title}*
+
+*Category:* `{category_name}`
+*Remaining Budget:* ₹{remaining:,.2f}
+
+_{'Please avoid further expenses in this category.' if level == 'critical' else 'Keep an eye on your spending here.'}_
+    """.strip()
