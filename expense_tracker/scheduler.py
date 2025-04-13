@@ -262,6 +262,7 @@ def notify_dependents_about_savings():
     frappe.logger().info("Savings Notification completed.")
     return {"status": "success", "message": "Savings notifications sent to all dependents."}
 
+@frappe.whitelist(allow_guest=True)
 def budget_health_checker():
     low_threshold = 500  
     critical_threshold = 100 
@@ -282,7 +283,6 @@ def budget_health_checker():
         message = get_alert_message(category.name, remaining, level).replace(".", "\\.").replace("!", "\\!")
 
         send_telegram_message(telegram_id, message)
-
 
 def get_alert_message(category_name, remaining, level):
     emoji = "🚨" if level == "critical" else "⚠️"
