@@ -7,10 +7,10 @@
  "docstatus": 0,
  "doctype": "Report",
  "filters": [],
- "idx": 0,
+ "idx": 1,
  "is_standard": "Yes",
  "letterhead": null,
- "modified": "2025-04-10 21:59:46.272783",
+ "modified": "2025-04-13 16:32:59.763365",
  "modified_by": "Administrator",
  "module": "Expense Tracker",
  "name": "Category-wise Expense Summary",
@@ -20,6 +20,10 @@
  "ref_doctype": "Expense",
  "report_name": "Category-wise Expense Summary",
  "report_type": "Query Report",
- "roles": [],
+ "roles": [
+  {
+   "role": "System Manager"
+  }
+ ],
  "timeout": 0
 }

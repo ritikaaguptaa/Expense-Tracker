@@ -7,10 +7,10 @@
  "docstatus": 0,
  "doctype": "Report",
  "filters": [],
- "idx": 0,
+ "idx": 3,
  "is_standard": "Yes",
  "letterhead": null,
- "modified": "2025-04-10 22:54:46.373104",
+ "modified": "2025-04-13 16:32:33.509846",
  "modified_by": "Administrator",
  "module": "Expense Tracker",
  "name": "Total Members",
@@ -23,9 +23,6 @@
  "roles": [
   {
    "role": "System Manager"
-  },
-  {
-   "role": "Expense Manager"
   }
  ],
  "timeout": 0
