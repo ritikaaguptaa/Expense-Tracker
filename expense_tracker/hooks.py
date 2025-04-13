@@ -155,7 +155,8 @@ scheduler_events = {
 # 		"expense_tracker.tasks.all"
 # 	],
 	"daily": [
-		"expense_tracker.scheduler.notify_family_on_low_pocket_money"
+		"expense_tracker.scheduler.notify_family_on_low_pocket_money",
+        "expense_tracker.scheduler.budget_health_checker"
 	],
 # 	"hourly": [
 # 		"expense_tracker.tasks.hourly"
