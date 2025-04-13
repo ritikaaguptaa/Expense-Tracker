@@ -7,10 +7,10 @@
  "docstatus": 0,
  "doctype": "Report",
  "filters": [],
- "idx": 0,
+ "idx": 3,
  "is_standard": "Yes",
  "letterhead": null,
- "modified": "2025-04-13 00:37:15.753558",
+ "modified": "2025-04-13 16:35:13.025472",
  "modified_by": "Administrator",
  "module": "Expense Tracker",
  "name": "Available Balance",
@@ -25,7 +25,7 @@
    "role": "System Manager"
   },
   {
-   "role": "Prepared Report User"
+   "role": "Expense Manager"
   }
  ],
  "timeout": 0

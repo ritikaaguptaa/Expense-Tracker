@@ -267,7 +267,7 @@ def budget_health_checker():
     low_threshold = 500  
     critical_threshold = 100 
 
-    categories = frappe.get_all("Expense Category", fields=["name", "budget", "associated_account_holder"])
+    categories = frappe.get_all("Expense Category", fields=["category_type", "budget", "associated_account_holder"])
 
     for category in categories:
         remaining = category.budget or 0
@@ -280,7 +280,7 @@ def budget_health_checker():
             continue
 
         level = "critical" if remaining <= critical_threshold else "warning"
-        message = get_alert_message(category.name, remaining, level).replace(".", "\\.").replace("!", "\\!")
+        message = get_alert_message(category.category_type, remaining, level).replace(".", "\\.").replace("!", "\\!")
 
         send_telegram_message(telegram_id, message)
 
