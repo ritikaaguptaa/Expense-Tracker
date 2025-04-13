@@ -7,10 +7,12 @@
  "engine": "InnoDB",
  "field_order": [
   "personal_information_section",
+  "first_name",
   "full_name",
   "email",
   "contact_number",
   "column_break_l1s8",
+  "last_name",
   "date_of_birth",
   "age",
   "telegram_id",
@@ -92,11 +94,21 @@
    "fieldname": "personal_information_section",
    "fieldtype": "Section Break",
    "label": "Personal Information"
+  },
+  {
+   "fieldname": "first_name",
+   "fieldtype": "Data",
+   "label": "First Name"
+  },
+  {
+   "fieldname": "last_name",
+   "fieldtype": "Data",
+   "label": "Last Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-04-09 07:09:54.877919",
+ "modified": "2025-04-13 08:50:44.792726",
  "modified_by": "Administrator",
  "module": "Expense Tracker",
  "name": "Primary Account",
