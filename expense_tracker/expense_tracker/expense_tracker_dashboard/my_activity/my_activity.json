@@ -17,7 +17,7 @@
    "width": "Full"
   },
   {
-   "chart": "Expense Breakdown by Category",
+   "chart": "Category Expense Breakdown",
    "width": "Half"
   },
   {
@@ -32,7 +32,7 @@
  "idx": 0,
  "is_default": 0,
  "is_standard": 1,
- "modified": "2025-04-13 01:43:29.493094",
+ "modified": "2025-04-22 17:22:27.538508",
  "modified_by": "Administrator",
  "module": "Expense Tracker",
  "name": "My Activity",
