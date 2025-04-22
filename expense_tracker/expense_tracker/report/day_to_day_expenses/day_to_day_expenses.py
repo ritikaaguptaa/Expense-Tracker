@@ -1,6 +1,8 @@
 # Copyright (c) 2025, siddharth and contributors
 # For license information, please see license.txt
 import frappe
+from collections import defaultdict
+from datetime import datetime
 
 def execute(filters=None):
     columns = [
@@ -9,39 +11,49 @@ def execute(filters=None):
         {"label": "Total Amount", "fieldname": "total_amount", "fieldtype": "Currency", "width": 120},
     ]
 
-    # Extract only the DATE part from the datetime field
-    data = frappe.db.sql("""
-        SELECT 
-            DATE(date) as date,
-            user_id,
-            SUM(amount) as total_amount
-        FROM `tabExpense`
-        GROUP BY user_id, DATE(date)
-        ORDER BY DATE(date)
-    """, as_dict=True)
+    expenses = frappe.get_list(
+        "Expense",
+        fields=["date", "user_id", "amount"],
+        ignore_permissions=False
+    )
 
-    # Get distinct sorted date labels
-    labels = sorted(list(set(row["date"].strftime("%Y-%m-%d") for row in data)))
+    aggregated_data = defaultdict(lambda: defaultdict(float))
+    all_dates = set()
+    user_ids = set()
 
-    # Collect unique user_ids
-    user_ids = list(set(row["user_id"] for row in data))
+    for row in expenses:
+        if not row.date:
+            continue
 
-    # Map user_ids to date -> amount
-    user_data_map = {user: {label: 0 for label in labels} for user in user_ids}
+        date_str = row.date.strftime("%Y-%m-%d")
+        user_id = row.user_id
+        amount = row.amount or 0
 
-    for row in data:
-        date_str = row["date"].strftime("%Y-%m-%d")
-        user_data_map[row["user_id"]][date_str] = row["total_amount"]
+        aggregated_data[user_id][date_str] += amount
+        all_dates.add(date_str)
+        user_ids.add(user_id)
 
-    # Prepare chart datasets
+    labels = sorted(all_dates)
+    user_ids = sorted(user_ids)
+
+    data = []
+    for user_id in user_ids:
+        for date in labels:
+            total_amount = aggregated_data[user_id].get(date, 0)
+            if total_amount:
+                data.append({
+                    "date": date,
+                    "user_id": user_id,
+                    "total_amount": total_amount
+                })
+
     datasets = [
         {
             "name": user_id,
-            "values": [user_data_map[user_id][label] for label in labels]
+            "values": [aggregated_data[user_id].get(label, 0) for label in labels]
         } for user_id in user_ids
     ]
 
-    # Final chart config
     chart = {
         "data": {
             "labels": labels,
