@@ -3,6 +3,7 @@ import os
 import requests
 import asyncio
 from deepgram import Deepgram
+from google.cloud import translate_v2 as translate
 import google.generativeai as genai
 import json
 import re
@@ -94,41 +95,125 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 #         print(message)  # Debugging
 #         send_telegram_message(chat_id, message)
 
+translate_client = translate.Client()
+
+def translate_text_to_english(text):
+    """Translate text to English using Google Cloud Translate."""
+    if not text.strip():
+        return ""
+    result = translate_client.translate(text, target_language='en')
+    return result["translatedText"]
+
 async def transcribe_audio_async(file_url, chat_id):
-    """Asynchronous function to transcribe audio using Deepgram API."""
+    """Transcribe audio from any language and translate result into English using Deepgram and Google Translate."""
     try:
         deepgram = Deepgram(DEEPGRAM_API_KEY)
 
-        response = await deepgram.transcription.prerecorded(
-            {"url": file_url},  # Use direct URL instead of reading the file
-            {"punctuate": True, "model": "nova", "language": "en"},
-        )
+        try:
+            send_telegram_message(chat_id, "⏳ *Processing...* 🎙️\n\nHold tight! We're transcribing your audio...".replace(".", "\\."))
+        except Exception as e:
+            frappe.log_error(title="Telegram Init Message Error", message=frappe.get_traceback())
 
-        transcript = response["results"]["channels"][0]["alternatives"][0]["transcript"]
-
-        escaped_transcript = transcript.replace(".", "\\.").replace("!", "\\!")
-
-        message = """
-        ⏳ *Processing...* 🎙️  
-  
-Hold tight! We're transcribing your audio...   
-        """
-
-        message = message.replace(".", "\\.").replace("!", "\\!")
-
-        send_telegram_message(chat_id, message)
         await asyncio.sleep(2)
-        message1 = """
-Almost Done\!
-"""
-        send_telegram_message(chat_id, message1)
-        time.sleep(4)
-        extract_and_notify(transcript, escaped_transcript, chat_id)
-        return transcript
+
+        try:
+            response = await deepgram.transcription.prerecorded(
+                {"url": file_url},
+                {
+                    "punctuate": True,
+                    "model": "nova-3-general",
+                    "detect_language": True
+                }
+            )
+        except Exception as e:
+            frappe.log_error(title="Deepgram Transcription Error", message=frappe.get_traceback())
+            send_telegram_message(chat_id, "❌ Failed to transcribe audio\\.")
+            return None
+
+        try:
+            transcript_data = response["results"]["channels"][0]
+            alternatives = transcript_data.get("alternatives", [])
+            transcript = alternatives[0]["transcript"] if alternatives else ""
+            detected_language = transcript_data.get("detected_language", "unknown")
+            language_confidence = transcript_data.get("language_confidence", 0)
+
+            print(f"Detected Language: {detected_language}, Confidence: {language_confidence}")
+            print(f"Original Transcript: {transcript}")
+        except Exception as e:
+            frappe.log_error(title="Transcript Extraction Error", message=frappe.get_traceback())
+            send_telegram_message(chat_id, "❌ Failed to process transcript\\.")
+            return None
+
+        try:
+            translated_text = translate_text_to_english(transcript)
+            escaped_translated = translated_text.replace(".", "\\.").replace("!", "\\!")
+        except Exception as e:
+            frappe.log_error(title="Translation Error", message=frappe.get_traceback())
+            send_telegram_message(chat_id, "❌ Failed to translate text\\.")
+            return None
+
+        try:
+            send_telegram_message(chat_id, "✅ Transcription done\\! Translating to English\\.\\.\\.")
+            await asyncio.sleep(2)
+            send_telegram_message(chat_id, f"*Translated to English* 🌍:\n\n{escaped_translated}")
+        except Exception as e:
+            frappe.log_error(title="Telegram Notification Error", message=frappe.get_traceback())
+
+        try:
+            await asyncio.sleep(1)
+            extract_and_notify(translated_text, escaped_translated, chat_id)
+        except Exception as e:
+            frappe.log_error(title="extract_and_notify Failed", message=frappe.get_traceback())
+            send_telegram_message(chat_id, "⚠️ Something went wrong while processing your request\\.")
+            return None
+
+        return {
+            "original_transcript": transcript,
+            "translated_text": translated_text,
+            "language": detected_language,
+            "confidence": language_confidence
+        }
 
     except Exception as e:
-        print(f"Error in transcription: {e}")
+        frappe.log_error(title="Top-Level Transcription Error", message=frappe.get_traceback())
+        send_telegram_message(chat_id, f"❌ Error during transcription or translation:\n{str(e)}")
         return None
+    
+# async def transcribe_audio_async(file_url, chat_id):
+#     """Asynchronous function to transcribe audio using Deepgram API."""
+#     try:
+#         deepgram = Deepgram(DEEPGRAM_API_KEY)
+
+#         response = await deepgram.transcription.prerecorded(
+#             {"url": file_url},  # Use direct URL instead of reading the file
+#             {"punctuate": True, "model": "nova", "language": "en"},
+#         )
+
+#         transcript = response["results"]["channels"][0]["alternatives"][0]["transcript"]
+
+#         escaped_transcript = transcript.replace(".", "\\.").replace("!", "\\!")
+
+#         message = """
+#         ⏳ *Processing...* 🎙️  
+  
+# Hold tight! We're transcribing your audio...   
+#         """
+
+#         message = message.replace(".", "\\.").replace("!", "\\!")
+
+#         send_telegram_message(chat_id, message)
+#         await asyncio.sleep(2)
+#         message1 = """
+# Almost Done\!
+# """
+#         send_telegram_message(chat_id, message1)
+#         time.sleep(4)
+#         extract_and_notify(transcript, escaped_transcript, chat_id)
+#         return transcript
+
+#     except Exception as e:
+#         print(f"Error in transcription: {e}")
+#         return None
 
 
 def extract_details_from_text(text):
@@ -682,7 +767,7 @@ We'll automatically update your budgets accordingly ✅
                                 🔹 *Get Notified* if a dependent tries to log expenses in unapproved categories  
 
                                 To explore complete insights, manage your dependents, and configure categories:  
-                                🌐 [Access Your Dashboard](https://two-korecent.frappe.cloud/)
+                                🌐 [Access Your Dashboard](https://two-korecent.frappe.cloud/app/dashboard-view/My%20Activity)
 
                                 Stay in control — effortlessly.
                             """)
