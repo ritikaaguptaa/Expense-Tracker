@@ -1,15 +1,161 @@
-<p>Dear {{ doc.full_name }},</p>
-<p>Exciting news! You are added as parent.</p>
-<p><b>Parent ID:</b> {{doc.name}} <i>(Use this ID to verify yourself on the bot)</i></p>
-<p>Start managing your expenses with ease.</p>
-<p>Click the link below and send the <b>/start</b> command to begin:</p>
-<br>
-<p style="text-align: center;">
-    <a href="http://t.me/XpenseTrackrbot" target="_blank" 
-       style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-        🔗 Start Tracking Now
-    </a>
-</p>
-<br>
-<p>Need help? Feel free to reach out.</p>
-<p>Best Regards,<br><b>Expense Tracker Team</b></p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f7f9fc;
+      font-family: 'Times New Roman', serif;
+      color: #333;
+    }
+    .container {
+      max-width: 620px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+    }
+    .header {
+      background: linear-gradient(to right, #7f5af0, #6246ea);
+      padding: 20px 30px 10px;
+      text-align: center;
+      position: relative;
+    }
+    .header::before {
+      content: "🚀";
+      font-size: 38px;
+      position: absolute;
+      top: 18px;
+      left: 20px;
+    }
+    .header img {
+      width: 110px;
+      margin-bottom: 8px;
+    }
+    .header h1 {
+      font-size: 22px;
+      color: #fff;
+      margin: 0;
+      font-family: 'Arpey', serif;
+    }
+    .confetti-bar {
+      text-align: center;
+      background-color: #fff0f6;
+      padding: 8px 20px;
+      font-size: 13px;
+      color: #d6336c;
+      font-weight: bold;
+      border-top: 1px dashed #f783ac;
+      border-bottom: 1px dashed #f783ac;
+    }
+    .content {
+      padding: 30px 30px;
+    }
+    .content h2 {
+      color: #5f3dc4;
+      font-size: 20px;
+      margin-top: 0;
+      font-family: 'Arpey', serif;
+    }
+    .content p {
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .id-box {
+      background: #f0f4ff;
+      border: 2px dotted #5f3dc4;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #3b28cc;
+      text-align: center;
+      margin: 20px 0;
+      box-shadow: inset 0 1px 6px rgba(95, 61, 196, 0.1);
+    }
+    .cta {
+      text-align: center;
+      margin-top: 32px;
+    }
+    .cta a {
+      background: #5f3dc4;
+      color: #fff !important;
+      text-decoration: none;
+      padding: 14px 26px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 16px;
+      display: inline-block;
+      transition: all 0.3s ease-in-out;
+      box-shadow: 0 5px 20px rgba(95, 61, 196, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .cta a::after {
+      content: "";
+      position: absolute;
+      top: -100%;
+      left: -100%;
+      width: 200%;
+      height: 200%;
+      background: rgba(255, 255, 255, 0.3);
+      animation: wave 2s infinite;
+    }
+    @keyframes wave {
+      0% { top: -100%; left: -100%; }
+      50% { top: 50%; left: 50%; transform: scale(1.5); }
+      100% { top: 100%; left: 100%; }
+    }
+    .cta a:hover {
+      background: #3b28cc;
+      box-shadow: 0 6px 24px rgba(59, 40, 204, 0.4);
+    }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #888;
+      background: #f1f3f5;
+      padding: 18px;
+    }
+    @media (max-width: 600px) {
+      .content {
+        padding: 20px;
+      }
+      .cta a {
+        width: 100%;
+        box-sizing: border-box;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="/assets/expense_tracker/images/finly.png" alt="Finly Logo" style="display: block;">
+      <h1>Welcome to Finly</h1>
+    </div>
+    <div class="confetti-bar">🎉 Your Finly primary account is live! 🎉</div>
+    <div class="content">
+      <h2>Hi {{ doc.full_name }},</h2>
+      <p>Your Finly account has been successfully created.</p>
+      <p>Here’s your unique <strong>Account ID</strong>. You’ll need it to verify yourself on our Telegram bot:</p>
+      <div class="id-box">{{ doc.name }}</div>
+      <p><strong style="color:#d6336c;">⚠️ Please keep this ID confidential</strong> to protect your account.</p>
+      <p>You’re now ready to manage your finances with ease — track expenses, analyze spending, and more.</p>
+      <div class="cta">
+        <a href="http://t.me/XpenseTrackrbot" target="_blank">🔗 Start with Finly</a>
+      </div>
+      <p style="margin-top: 30px;">Need any help? We’re just a message away.</p>
+      <p>With 💜 from Team Finly</p>
+    </div>
+    <div class="footer">
+      &copy; 2025 Finly Inc. | Simplifying your financial life 💸
+    </div>
+  </div>
+</body>
+</html>

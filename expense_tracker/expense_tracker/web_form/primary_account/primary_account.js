@@ -26,6 +26,9 @@
 //     frappe.web_form.on('first_name', updateFullName);
 //     frappe.web_form.on('last_name', updateFullName);
 // });
+const script = document.createElement("script");
+script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js";
+document.head.appendChild(script);
 
 
 frappe.ready(function () {
@@ -96,6 +99,10 @@ frappe.ready(function () {
             transition: background-color 0.2s ease, transform 0.2s ease;
         }
 
+        .frappe-control .selected-phone .country {
+            color: #1e293b;
+        }
+
         .btn-primary:hover {
             background-color: #2563eb;
             transform: translateY(-1px);
@@ -105,6 +112,19 @@ frappe.ready(function () {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        .success-page .success-body .success-message {
+            color: #1e293b;
+        }
+
+        .phone-picker .search-phones input[type=search] {
+            color: white;
+        }
+
+        .msgprint {
+            color: #1e293b;
+        }
+
     `;
     document.head.appendChild(style);
 
@@ -132,6 +152,30 @@ frappe.ready(function () {
         const full_name = `${first_name} ${last_name}`.trim();
         frappe.web_form.set_value('full_name', full_name);
     }
+
+    frappe.web_form.after_save = () => {
+        if (typeof confetti === "function") {
+            confetti({
+                particleCount: 100,
+                spread: 60,
+                origin: { x: 0, y: 1 },
+                angle: 60
+            });
+        
+            confetti({
+                particleCount: 100,
+                spread: 60,
+                origin: { x: 1, y: 1 },
+                angle: 120
+            });
+        }
+        
+
+        frappe.show_alert({
+            message: __('🎉 Registration successful!<br>Please check your email to complete your registration and start tracking your expenses.'),
+            indicator: 'green'
+        }, 7); 
+    };
 
     frappe.web_form.on('first_name', updateFullName);
     frappe.web_form.on('last_name', updateFullName);
