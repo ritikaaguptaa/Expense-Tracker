@@ -3,9 +3,8 @@ import os
 import requests
 import asyncio
 from deepgram import Deepgram
-from google.cloud import translate_v2 as translate
-from google.oauth2 import service_account
 import google.generativeai as genai
+from langdetect import detect
 import json
 import re
 import time
@@ -96,32 +95,32 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 #         print(message)  # Debugging
 #         send_telegram_message(chat_id, message)
 
-def get_translate_client():
-    credentials_info = {
-        "type": os.getenv("GOOGLE_TYPE"),
-        "project_id": os.getenv("GOOGLE_PROJECT_ID"),
-        "private_key_id": os.getenv("GOOGLE_PRIVATE_KEY_ID"),
-        "private_key": os.getenv("GOOGLE_PRIVATE_KEY", "").replace("\\n", "\n"),
-        "client_email": os.getenv("GOOGLE_CLIENT_EMAIL"),
-        "client_id": os.getenv("GOOGLE_CLIENT_ID"),
-        "auth_uri": os.getenv("GOOGLE_AUTH_URI"),
-        "token_uri": os.getenv("GOOGLE_TOKEN_URI"),
-        "auth_provider_x509_cert_url": os.getenv("GOOGLE_AUTH_PROVIDER_CERT_URL"),
-        "client_x509_cert_url": os.getenv("GOOGLE_CLIENT_CERT_URL"),
-        "universe_domain": os.getenv("GOOGLE_UNIVERSE_DOMAIN"),
-    }
-
-    credentials = service_account.Credentials.from_service_account_info(credentials_info)
-    return translate.Client(credentials=credentials)
-
-translate_client = get_translate_client()
-
-def translate_text_to_english(text):
-    """Translate text to English using Google Cloud Translate."""
+def translate_text_mymemory(text, target_lang='en'):
     if not text.strip():
         return ""
-    result = translate_client.translate(text, target_language='en')
-    return result["translatedText"]
+    try:
+        source_lang = detect(text)
+        if source_lang.lower() == 'en' and target_lang.lower() == 'en':
+            return text
+        api_url = "https://api.mymemory.translated.net/get"
+        params = {
+            "q": text,
+            "langpair": f"{source_lang}|{target_lang}"
+        }
+        response = requests.get(api_url, params=params)
+        response.raise_for_status()
+        translation_data = response.json()
+        if "responseData" in translation_data and "translatedText" in translation_data["responseData"]:
+            return translation_data["responseData"]["translatedText"]
+        elif "errorMessage" in translation_data:
+            print(f"MyMemory API Error: {translation_data['errorMessage']}")
+            return ""
+        else:
+            print("Error: Unexpected response from MyMemory API.")
+            return ""
+    except Exception as e:
+        print(f"Translation error: {e}")
+        return ""
 
 async def transcribe_audio_async(file_url, chat_id):
     """Transcribe audio from any language and translate result into English using Deepgram and Google Translate."""
@@ -164,7 +163,7 @@ async def transcribe_audio_async(file_url, chat_id):
             return None
 
         try:
-            translated_text = translate_text_to_english(transcript)
+            translated_text = translate_text_mymemory(transcript) 
             escaped_translated = translated_text.replace(".", "\\.").replace("!", "\\!")
         except Exception as e:
             frappe.log_error(title="Translation Error", message=frappe.get_traceback())
