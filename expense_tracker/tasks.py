@@ -98,17 +98,17 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 def get_translate_client():
     credentials_info = {
-        "type": os.environ.get("GOOGLE_TYPE"),
-        "project_id": os.environ.get("GOOGLE_PROJECT_ID"),
-        "private_key_id": os.environ.get("GOOGLE_PRIVATE_KEY_ID"),
-        "private_key": os.environ.get("GOOGLE_PRIVATE_KEY").replace("\\n", "\n"),
-        "client_email": os.environ.get("GOOGLE_CLIENT_EMAIL"),
-        "client_id": os.environ.get("GOOGLE_CLIENT_ID"),
-        "auth_uri": os.environ.get("GOOGLE_AUTH_URI"),
-        "token_uri": os.environ.get("GOOGLE_TOKEN_URI"),
-        "auth_provider_x509_cert_url": os.environ.get("GOOGLE_AUTH_PROVIDER_CERT_URL"),
-        "client_x509_cert_url": os.environ.get("GOOGLE_CLIENT_CERT_URL"),
-        "universe_domain": os.environ.get("GOOGLE_UNIVERSE_DOMAIN"),
+        "type": os.getenv("GOOGLE_TYPE"),
+        "project_id": os.getenv("GOOGLE_PROJECT_ID"),
+        "private_key_id": os.getenv("GOOGLE_PRIVATE_KEY_ID"),
+        "private_key": os.getenv("GOOGLE_PRIVATE_KEY", "").replace("\\n", "\n"),
+        "client_email": os.getenv("GOOGLE_CLIENT_EMAIL"),
+        "client_id": os.getenv("GOOGLE_CLIENT_ID"),
+        "auth_uri": os.getenv("GOOGLE_AUTH_URI"),
+        "token_uri": os.getenv("GOOGLE_TOKEN_URI"),
+        "auth_provider_x509_cert_url": os.getenv("GOOGLE_AUTH_PROVIDER_CERT_URL"),
+        "client_x509_cert_url": os.getenv("GOOGLE_CLIENT_CERT_URL"),
+        "universe_domain": os.getenv("GOOGLE_UNIVERSE_DOMAIN"),
     }
 
     credentials = service_account.Credentials.from_service_account_info(credentials_info)
