@@ -2,7 +2,7 @@
 	<img src=".github/images/finly_whisper_wealth.png" width="80" height="80"/>
 	<h1>Finly</h1>
 
-**Intelligent, Conversational Expense Management — Built for the Future of Personal Finance**
+**Whisper Wealth — Intelligent, Conversational Expense Management for the Future of Personal Finance**
 </div>
 
 <div align="center">
@@ -12,7 +12,7 @@
 <div align="center">
 	<img src=".github/images/hero-section.png" alt="Finly Hero Image" />
 </div>
-
+<br>
 <div align="center">
     <a href="https://two-korecent.frappe.cloud/">Website</a>
 </div>
@@ -85,7 +85,7 @@ Stay tuned! We are working to open source the deployment scripts soon.
 <div align="center">
 	<a href="https://two-korecent.frappe.cloud/" target="_blank">
 		<picture>
-			<img src=".github/images/Finly.png" alt="Finly.ai" height="28"/>
+			<img src=".github/images/Finly.png" alt="Finly.ai" height="6rem"/>
 		</picture>
 	</a>
 </div>
