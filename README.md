@@ -85,7 +85,7 @@ Stay tuned! We are working to open source the deployment scripts soon.
 <div align="center">
 	<a href="https://two-korecent.frappe.cloud/" target="_blank">
 		<picture>
-			<img src=".github/images/Finly.png" alt="Finly.ai" height="6rem"/>
+			<img src=".github/images/Finly.png" alt="Finly.ai" height="96"/>
 		</picture>
 	</a>
 </div>
