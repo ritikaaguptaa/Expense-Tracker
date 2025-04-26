@@ -113,24 +113,18 @@ def translate_text_mymemory(text, target_lang='en'):
         if "responseData" in translation_data and "translatedText" in translation_data["responseData"]:
             return translation_data["responseData"]["translatedText"]
         elif "errorMessage" in translation_data:
-            print(f"MyMemory API Error: {translation_data['errorMessage']}")
             return ""
         else:
-            print("Error: Unexpected response from MyMemory API.")
             return ""
     except Exception as e:
-        print(f"Translation error: {e}")
         return ""
 
 async def transcribe_audio_async(file_url, chat_id):
-    """Transcribe audio from any language and translate result into English using Deepgram and Google Translate."""
     try:
         deepgram = Deepgram(DEEPGRAM_API_KEY)
 
-        try:
-            send_telegram_message(chat_id, "⏳ *Processing...* 🎙️\n\nHold tight! We're transcribing your audio...".replace(".", "\\."))
-        except Exception as e:
-            frappe.log_error(title="Telegram Init Message Error", message=frappe.get_traceback())
+        send_telegram_message(chat_id, "⏳ *Processing...* 🎙️\n\nHold tight! We're transcribing your audio...".replace(".", "\\.").replace("!", "\\!").replace("_", "\\_"))
+
 
         await asyncio.sleep(2)
 
@@ -155,8 +149,6 @@ async def transcribe_audio_async(file_url, chat_id):
             detected_language = transcript_data.get("detected_language", "unknown")
             language_confidence = transcript_data.get("language_confidence", 0)
 
-            print(f"Detected Language: {detected_language}, Confidence: {language_confidence}")
-            print(f"Original Transcript: {transcript}")
         except Exception as e:
             frappe.log_error(title="Transcript Extraction Error", message=frappe.get_traceback())
             send_telegram_message(chat_id, "❌ Failed to process transcript\\.")
@@ -164,26 +156,14 @@ async def transcribe_audio_async(file_url, chat_id):
 
         try:
             translated_text = translate_text_mymemory(transcript) 
-            escaped_translated = translated_text.replace(".", "\\.").replace("!", "\\!")
+            escaped_translated = translated_text.replace(".", "\\.").replace("!", "\\!").replace("_", "\\_")
         except Exception as e:
             frappe.log_error(title="Translation Error", message=frappe.get_traceback())
             send_telegram_message(chat_id, "❌ Failed to translate text\\.")
             return None
-
-        try:
-            send_telegram_message(chat_id, "✅ Transcription done\\! Translating to English\\.\\.\\.")
-            await asyncio.sleep(2)
-            send_telegram_message(chat_id, f"*Translated to English* 🌍:\n\n{escaped_translated}")
-        except Exception as e:
-            frappe.log_error(title="Telegram Notification Error", message=frappe.get_traceback())
-
-        try:
-            await asyncio.sleep(1)
-            extract_and_notify(translated_text, escaped_translated, chat_id)
-        except Exception as e:
-            frappe.log_error(title="extract_and_notify Failed", message=frappe.get_traceback())
-            send_telegram_message(chat_id, "⚠️ Something went wrong while processing your request\\.")
-            return None
+        
+        await asyncio.sleep(2)
+        extract_and_notify(translated_text, escaped_translated, chat_id)
 
         return {
             "original_transcript": transcript,
@@ -571,7 +551,7 @@ def send_telegram_message_with_keyboard(chat_id, message, keyboard):
         frappe.logger().error(f"Error sending Telegram message: {str(e)}")
 
 def send_pdf_to_telegram(chat_id, file_path):
-    url = f"https://api.telegram.org/bot{bot_token}/sendDocument"
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument"
     
     with open(file_path, "rb") as f:
         files = {"document": f}
@@ -751,11 +731,7 @@ We'll automatically update your budgets accordingly ✅
                         if hasattr(response, "text")
                         else "Sorry, I couldn't process your request."
                     )
-                    escaped_ai_response = (
-                        ai_response.replace(".", "\\.")
-                        .replace("!", "\\!")
-                        .replace("_", "\\_")
-                    )
+                    escaped_ai_response = ai_response.replace(".", "\\.").replace("!", "\\!").replace("_", "\\_")
 
                     send_telegram_message(chat_id, escaped_ai_response)
                 else:
