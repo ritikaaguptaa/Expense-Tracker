@@ -39,14 +39,14 @@ frappe.ready(function () {
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(120deg,rgb(46, 61, 95),rgb(71, 96, 136));
+            background: linear-gradient(135deg, #090e1a 0%,rgb(70, 26, 131) 100%);
             color: #f8fafc;
         }
 
         .web-form-wrapper {
             max-width: 720px;
             margin: 40px auto;
-            background: #1e293b;
+            background:rgb(50, 24, 87);
             padding: 40px;
             border-radius: 16px;
             box-shadow: 0px 12px 30px rgba(0, 0, 0, 0.4);
