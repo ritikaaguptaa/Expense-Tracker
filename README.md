@@ -1,6 +1,6 @@
 <div align="center" markdown="1">
-	<img src=".github/images/finly_whisper_wealth.png" width="80" height="80"/>
-	<h1>Finly</h1>
+	<img src=".github/images/finly_whisper_wealth.png" width="96" height="96"/>
+	<h1>Finly - Whisper Wealth</h1>
 
 **Whisper Wealth — Intelligent, Conversational Expense Management for the Future of Personal Finance**
 </div>
@@ -14,7 +14,7 @@
 </div>
 <br>
 <div align="center">
-    <a href="https://two-korecent.frappe.cloud/">Website</a>
+    <a href="https://two-korecent.frappe.cloud/frontend/">Website</a>
 </div>
 
 ## Finly
@@ -67,7 +67,7 @@ Our mission: **To empower individuals with real-time control over their financia
 ### Hosted Version
 
 You can directly start using Finly by visiting:  
-👉 [**finly.ai**](https://two-korecent.frappe.cloud/)
+👉 [**finly.ai**](https://two-korecent.frappe.cloud/frontend/)
 
 No installations, no hassle — sign up and start managing your finances with AI superpowers.
 
