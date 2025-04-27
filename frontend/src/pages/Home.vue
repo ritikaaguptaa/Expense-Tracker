@@ -25,7 +25,8 @@
             <path d="M2 17L12 22L22 17"></path>
             <path d="M2 12L12 17L22 12"></path>
           </svg> -->
-          <img src="../../public/finly_whisper_weallth.png" alt="Finly Logo" width="30" height="30" viewBox="0 0 24 24" fill="white" style="filter: brightness(0) invert(1);" />
+          <img src="../../public/finly_whisper_weallth.png" alt="Finly Logo" width="30" height="30" viewBox="0 0 24 24"
+            fill="white" style="filter: brightness(0) invert(1);" />
 
         </div>
         Finly
@@ -39,27 +40,15 @@
       </div>
 
       <div class="cta">
-        <a
-          href="https://two-korecent.frappe.cloud/app/dashboard-view/My%20Activity"
-          class="login-btn"
-          >Log In</a
-        >
+        <a href="https://two-korecent.frappe.cloud/app/dashboard-view/My%20Activity" class="login-btn">Log In</a>
       </div>
     </nav>
 
     <div class="hero">
       <div class="hero-content">
         <div class="hero-subtitle">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>
             <path d="M12 6v6l4 2"></path>
           </svg>
@@ -76,21 +65,10 @@
         </p>
 
         <div class="hero-buttons">
-          <a
-            href="https://two-korecent.frappe.cloud/primary-account/new"
-            class="btn btn-primary"
-          >
+          <a href="https://two-korecent.frappe.cloud/primary-account/new" class="btn btn-primary">
             Get Started
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
               <path d="M5 12h14"></path>
               <path d="M12 5l7 7-7 7"></path>
             </svg>
@@ -109,24 +87,21 @@
           <div class="feature">
             <svg class="feature-icon" viewBox="0 0 24 24" fill="currentColor">
               <path
-                d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,10.5A1.5,1.5 0 0,1 13.5,12A1.5,1.5 0 0,1 12,13.5A1.5,1.5 0 0,1 10.5,12A1.5,1.5 0 0,1 12,10.5M7.5,10.5A1.5,1.5 0 0,1 9,12A1.5,1.5 0 0,1 7.5,13.5A1.5,1.5 0 0,1 6,12A1.5,1.5 0 0,1 7.5,10.5M16.5,10.5A1.5,1.5 0 0,1 18,12A1.5,1.5 0 0,1 16.5,13.5A1.5,1.5 0 0,1 15,12A1.5,1.5 0 0,1 16.5,10.5Z"
-              />
+                d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,10.5A1.5,1.5 0 0,1 13.5,12A1.5,1.5 0 0,1 12,13.5A1.5,1.5 0 0,1 10.5,12A1.5,1.5 0 0,1 12,10.5M7.5,10.5A1.5,1.5 0 0,1 9,12A1.5,1.5 0 0,1 7.5,13.5A1.5,1.5 0 0,1 6,12A1.5,1.5 0 0,1 7.5,10.5M16.5,10.5A1.5,1.5 0 0,1 18,12A1.5,1.5 0 0,1 16.5,13.5A1.5,1.5 0 0,1 15,12A1.5,1.5 0 0,1 16.5,10.5Z" />
             </svg>
             AI-Powered
           </div>
           <div class="feature">
             <svg class="feature-icon" viewBox="0 0 24 24" fill="currentColor">
               <path
-                d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,10.5A1.5,1.5 0 0,1 13.5,12A1.5,1.5 0 0,1 12,13.5A1.5,1.5 0 0,1 10.5,12A1.5,1.5 0 0,1 12,10.5M7.5,10.5A1.5,1.5 0 0,1 9,12A1.5,1.5 0 0,1 7.5,13.5A1.5,1.5 0 0,1 6,12A1.5,1.5 0 0,1 7.5,10.5M16.5,10.5A1.5,1.5 0 0,1 18,12A1.5,1.5 0 0,1 16.5,13.5A1.5,1.5 0 0,1 15,12A1.5,1.5 0 0,1 16.5,10.5Z"
-              />
+                d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,10.5A1.5,1.5 0 0,1 13.5,12A1.5,1.5 0 0,1 12,13.5A1.5,1.5 0 0,1 10.5,12A1.5,1.5 0 0,1 12,10.5M7.5,10.5A1.5,1.5 0 0,1 9,12A1.5,1.5 0 0,1 7.5,13.5A1.5,1.5 0 0,1 6,12A1.5,1.5 0 0,1 7.5,10.5M16.5,10.5A1.5,1.5 0 0,1 18,12A1.5,1.5 0 0,1 16.5,13.5A1.5,1.5 0 0,1 15,12A1.5,1.5 0 0,1 16.5,10.5Z" />
             </svg>
             Voice Commands
           </div>
           <div class="feature">
             <svg class="feature-icon" viewBox="0 0 24 24" fill="currentColor">
               <path
-                d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,10.5A1.5,1.5 0 0,1 13.5,12A1.5,1.5 0 0,1 12,13.5A1.5,1.5 0 0,1 10.5,12A1.5,1.5 0 0,1 12,10.5M7.5,10.5A1.5,1.5 0 0,1 9,12A1.5,1.5 0 0,1 7.5,13.5A1.5,1.5 0 0,1 6,12A1.5,1.5 0 0,1 7.5,10.5M16.5,10.5A1.5,1.5 0 0,1 18,12A1.5,1.5 0 0,1 16.5,13.5A1.5,1.5 0 0,1 15,12A1.5,1.5 0 0,1 16.5,10.5Z"
-              />
+                d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,10.5A1.5,1.5 0 0,1 13.5,12A1.5,1.5 0 0,1 12,13.5A1.5,1.5 0 0,1 10.5,12A1.5,1.5 0 0,1 12,10.5M7.5,10.5A1.5,1.5 0 0,1 9,12A1.5,1.5 0 0,1 7.5,13.5A1.5,1.5 0 0,1 6,12A1.5,1.5 0 0,1 7.5,10.5M16.5,10.5A1.5,1.5 0 0,1 18,12A1.5,1.5 0 0,1 16.5,13.5A1.5,1.5 0 0,1 15,12A1.5,1.5 0 0,1 16.5,10.5Z" />
             </svg>
             Real-time Insights
           </div>
@@ -139,16 +114,8 @@
             <div class="dashboard-content">
               <div class="dashboard-header">
                 <div class="dashboard-title">Financial Overview</div>
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="white"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="12" cy="12" r="1"></circle>
                   <circle cx="19" cy="12" r="1"></circle>
                   <circle cx="5" cy="12" r="1"></circle>
@@ -183,19 +150,9 @@
                   <div class="transaction-item">
                     <div class="transaction-left">
                       <div class="transaction-icon">
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="white"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        >
-                          <path
-                            d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
-                          ></path>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"
+                          stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                           <circle cx="12" cy="10" r="3"></circle>
                         </svg>
                       </div>
@@ -210,24 +167,9 @@
                   <div class="transaction-item">
                     <div class="transaction-left">
                       <div class="transaction-icon">
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="white"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        >
-                          <rect
-                            x="3"
-                            y="4"
-                            width="18"
-                            height="18"
-                            rx="2"
-                            ry="2"
-                          ></rect>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"
+                          stroke-linecap="round" stroke-linejoin="round">
+                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                           <line x1="16" y1="2" x2="16" y2="6"></line>
                           <line x1="8" y1="2" x2="8" y2="6"></line>
                           <line x1="3" y1="10" x2="21" y2="10"></line>
@@ -244,19 +186,10 @@
                   <div class="transaction-item">
                     <div class="transaction-left">
                       <div class="transaction-icon">
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="white"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        >
-                          <path
-                            d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"
-                          ></path>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"
+                          stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z">
+                          </path>
                           <line x1="7" y1="7" x2="7.01" y2="7"></line>
                         </svg>
                       </div>
@@ -294,19 +227,9 @@
         <div class="service-card">
           <div class="service-icon-wrapper">
             <div class="service-icon">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path
-                  d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
-                ></path>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
               </svg>
             </div>
           </div>
@@ -317,18 +240,9 @@
             categories based on your unique needs and automatically logs your
             spending, ensuring you always stay on top of your budget.
           </p>
-          <a href="#" class="service-link"
-            >Learn More
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
+          <a href="#" class="service-link">Learn More
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
               <path d="M5 12h14"></path>
               <path d="M12 5l7 7-7 7"></path>
             </svg>
@@ -339,16 +253,8 @@
           <div class="service-icon-wrapper">
             <div class="service-icon">
               <!-- Globe icon for multilingual support -->
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="2" y1="12" x2="22" y2="12"></line>
                 <path d="M12 2a15.3 15.3 0 0 1 0 20"></path>
@@ -364,17 +270,9 @@
           </p>
           <a href="#" class="service-link">
             Learn More
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M5 12h14"></path>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14"></path>s
               <path d="M12 5l7 7-7 7"></path>
             </svg>
           </a>
@@ -383,16 +281,8 @@
         <div class="service-card">
           <div class="service-icon-wrapper">
             <div class="service-icon">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
                 <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
               </svg>
@@ -405,18 +295,9 @@
             exceeding or if your balance is running low. Finly ensures that
             you're always informed and prepared.
           </p>
-          <a href="#" class="service-link"
-            >Learn More
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
+          <a href="#" class="service-link">Learn More
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
               <path d="M5 12h14"></path>
               <path d="M12 5l7 7-7 7"></path>
             </svg>
@@ -426,16 +307,8 @@
         <div class="service-card">
           <div class="service-icon-wrapper">
             <div class="service-icon">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="20" x2="12" y2="10"></line>
                 <line x1="18" y1="20" x2="18" y2="4"></line>
                 <line x1="6" y1="20" x2="6" y2="16"></line>
@@ -449,18 +322,9 @@
             identify opportunities for savings, and receive personalized
             recommendations tailored to your financial goals.
           </p>
-          <a href="#" class="service-link"
-            >Learn More
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
+          <a href="#" class="service-link">Learn More
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
               <path d="M5 12h14"></path>
               <path d="M12 5l7 7-7 7"></path>
             </svg>
@@ -477,21 +341,10 @@
             Unlock smarter, effortless expense management with Finly’s
             AI-powered insights.
           </p>
-          <a
-            href="https://two-korecent.frappe.cloud/primary-account/new"
-            class="btn btn-primary"
-          >
+          <a href="https://two-korecent.frappe.cloud/primary-account/new" class="btn btn-primary">
             Start Your Free Trial
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
               <path d="M5 12h14"></path>
               <path d="M12 5l7 7-7 7"></path>
             </svg>
@@ -504,31 +357,19 @@
                 <div class="chat-header">
                   <div class="chat-avatar"></div>
                   <div class="chat-title">Finly</div>
-                  <!-- Changed from "Finly Assistant" to just "Finly" -->
                 </div>
                 <div class="chat-messages">
                   <!-- Audio message from user -->
                   <div class="chat-message user">
                     <div class="audio-message">
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path
-                          d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"
-                        ></path>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
                         <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
                         <line x1="12" y1="19" x2="12" y2="22"></line>
                       </svg>
                       <div class="audio-waveform">
-                        <span></span><span></span><span></span><span></span
-                        ><span></span>
+                        <span></span><span></span><span></span><span></span><span></span>
                       </div>
                       <span class="audio-duration">0:08</span>
                     </div>
@@ -536,29 +377,39 @@
 
                   <!-- Bot responses for audio processing -->
                   <div class="chat-message bot">
-                    <div class="message-text">Processing...</div>
+                    <div class="typing-indicator">
+                      <span></span><span></span><span></span>
+                    </div>
+                    <div class="message-text" style="display: none;">Processing...</div>
                   </div>
 
                   <div class="chat-message bot">
-                    <div class="message-text">
+                    <div class="typing-indicator">
+                      <span></span><span></span><span></span>
+                    </div>
+                    <div class="message-text" style="display: none;">
                       Hold tight! We're transcribing your audio.
                     </div>
                   </div>
 
                   <div class="chat-message bot">
-                    <div class="message-text">Almost Done!</div>
+                    <div class="typing-indicator">
+                      <span></span><span></span><span></span>
+                    </div>
+                    <div class="message-text" style="display: none;">Almost Done!</div>
                   </div>
 
                   <div class="chat-message bot">
-                    <div class="message-text">
+                    <div class="typing-indicator">
+                      <span></span><span></span><span></span>
+                    </div>
+                    <div class="message-text" style="display: none;">
                       <strong>Transcription Complete!</strong><br />
                       "I spent two hundred on Uber."<br /><br />
                       <strong>Expense Details Extracted</strong><br />
                       <span class="expense-item">Amount: $200.00</span><br />
-                      <span class="expense-item">Category: Transport</span
-                      ><br />
-                      <span class="expense-item">Merchant: Uber</span
-                      ><br /><br />
+                      <span class="expense-item">Category: Transport</span><br />
+                      <span class="expense-item">Merchant: Uber</span><br /><br />
                       This record has been automatically saved in the Expense
                       Doctype!<br />
                       <em>Effortless tracking for smarter spending!</em>
@@ -569,34 +420,16 @@
                 <div class="chat-input">
                   <input type="text" placeholder="Send a message..." />
                   <button class="send-button">
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
                       <line x1="22" y1="2" x2="11" y2="13"></line>
                       <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                     </svg>
                   </button>
                   <button class="voice-button">
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <path
-                        d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"
-                      ></path>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
                       <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
                       <line x1="12" y1="19" x2="12" y2="22"></line>
                     </svg>
@@ -626,19 +459,9 @@
           <div class="testimonial-card">
             <div class="testimonial-content">
               <div class="quote-icon">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path
-                    d="M3 21c3.73-2.43 5.57-5.2 5.57-10V3h6v8c0 4.8 1.84 7.57 5.57 10"
-                  ></path>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 21c3.73-2.43 5.57-5.2 5.57-10V3h6v8c0 4.8 1.84 7.57 5.57 10"></path>
                 </svg>
               </div>
               <p class="testimonial-text">
@@ -659,19 +482,9 @@
           <div class="testimonial-card">
             <div class="testimonial-content">
               <div class="quote-icon">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path
-                    d="M3 21c3.73-2.43 5.57-5.2 5.57-10V3h6v8c0 4.8 1.84 7.57 5.57 10"
-                  ></path>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 21c3.73-2.43 5.57-5.2 5.57-10V3h6v8c0 4.8 1.84 7.57 5.57 10"></path>
                 </svg>
               </div>
               <p class="testimonial-text">
@@ -691,19 +504,9 @@
           <div class="testimonial-card">
             <div class="testimonial-content">
               <div class="quote-icon">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path
-                    d="M3 21c3.73-2.43 5.57-5.2 5.57-10V3h6v8c0 4.8 1.84 7.57 5.57 10"
-                  ></path>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 21c3.73-2.43 5.57-5.2 5.57-10V3h6v8c0 4.8 1.84 7.57 5.57 10"></path>
                 </svg>
               </div>
               <p class="testimonial-text">
@@ -724,16 +527,8 @@
 
         <div class="slider-controls">
           <button class="slider-arrow prev">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
               <path d="M19 12H5"></path>
               <path d="M12 19l-7-7 7-7"></path>
             </svg>
@@ -744,16 +539,8 @@
             <span class="dot"></span>
           </div>
           <button class="slider-arrow next">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
               <path d="M5 12h14"></path>
               <path d="M12 5l7 7-7 7"></path>
             </svg>
@@ -767,13 +554,14 @@
   <footer class="footer" ref="footer">
     <div class="footer-gradient"></div>
     <div class="particles-container" ref="particles"></div>
-    
+
     <div class="container">
       <div class="footer-top">
         <div class="footer-brand" ref="footerBrand">
           <a href="#" class="footer-logo">
             <div class="logo-icon">
-              <img src="../../public/finly_whisper_weallth.png" alt="Finly Logo" width="30" height="30" style="filter: brightness(0) invert(1);"/>
+              <img src="../../public/finly_whisper_weallth.png" alt="Finly Logo" width="30" height="30"
+                style="filter: brightness(0) invert(1);" />
             </div>
             Finly
           </a>
@@ -781,18 +569,10 @@
             AI-powered expense management for smarter financial decisions.
           </p>
           <div class="social-links" ref="socialLinks">
-            <a href="#" class="social-link" v-for="(icon, index) in socialIcons" :key="index" @mouseover="animateSocialIcon" @mouseout="resetSocialIcon">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                v-html="icon"
-              ></svg>
+            <a href="#" class="social-link" v-for="(icon, index) in socialIcons" :key="index"
+              @mouseover="animateSocialIcon" @mouseout="resetSocialIcon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" v-html="icon"></svg>
             </a>
           </div>
         </div>
@@ -806,16 +586,8 @@
             <input type="email" placeholder="Your email address" required ref="emailInput" />
             <button type="submit" class="btn btn-primary subscribe-btn" ref="subscribeBtn">
               <span>Subscribe</span>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
                 <path d="M5 12h14"></path>
                 <path d="M12 5l7 7-7 7"></path>
               </svg>
@@ -828,32 +600,16 @@
         <div class="copyright">&copy; {{ currentYear }} Finly, All rights reserved.</div>
         <div class="footer-badges">
           <div class="badge security-badge" ref="securityBadge">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
             </svg>
             <span class="badge-text">256-bit Encryption</span>
           </div>
           <div class="badge terms-badge" ref="termsBadge">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
             </svg>
             <a href="#" class="terms-link">Terms & Conditions</a>
@@ -891,7 +647,7 @@ export default {
             if (typingIndicator) {
               typingIndicator.style.display = 'none';
             }
-            
+
             if (messageText) {
               messageText.style.display = 'block';
               messageText.style.opacity = '0';
@@ -913,7 +669,7 @@ export default {
     initScrollAnimations() {
       // Animate service cards on scroll using Intersection Observer
       const serviceCards = document.querySelectorAll('.service-card');
-      
+
       const observerOptions = {
         threshold: 0.2,
         rootMargin: '0px'
@@ -950,7 +706,7 @@ export default {
       if (servicesSection) {
         sectionObserver.observe(servicesSection);
       }
-      
+
       if (footer) {
         sectionObserver.observe(footer);
       }
@@ -1001,21 +757,17 @@ body {
   position: absolute;
   width: 100%;
   height: 100%;
-  background: radial-gradient(
-    circle at 70% 30%,
-    rgba(131, 56, 236, 0.15) 0%,
-    rgba(9, 14, 26, 0) 70%
-  );
+  background: radial-gradient(circle at 70% 30%,
+      rgba(131, 56, 236, 0.15) 0%,
+      rgba(9, 14, 26, 0) 70%);
 }
 
 .bg-grid {
   position: absolute;
   width: 200%;
   height: 200%;
-  background-image: linear-gradient(
-      rgba(255, 255, 255, 0.02) 1px,
-      transparent 1px
-    ),
+  background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px,
+      transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
   background-size: 30px 30px;
   transform: perspective(500px) rotateX(60deg);
@@ -1120,9 +872,9 @@ body {
   align-items: center;
   gap: 12px;
   font-size: 1.8rem;
-  font-weight: 700; 
+  font-weight: 700;
   font-family: "Amazon Ember", "Helvetica Neue", Arial, "Roboto", "Open Sans", sans-serif;
-  letter-spacing: 0em; 
+  letter-spacing: 0em;
   color: var(--light);
   text-decoration: none;
   transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.4s ease;
@@ -1155,12 +907,10 @@ body {
   position: absolute;
   width: 160%;
   height: 160%;
-  background: linear-gradient(
-    120deg,
-    transparent,
-    rgba(255, 255, 255, 0.25),
-    transparent
-  );
+  background: linear-gradient(120deg,
+      transparent,
+      rgba(255, 255, 255, 0.25),
+      transparent);
   transform: translateX(-100%);
   animation: shine 2.8s infinite linear;
 }
@@ -1258,12 +1008,10 @@ body {
   left: -120%;
   width: 120%;
   height: 100%;
-  background: linear-gradient(
-    120deg,
-    transparent,
-    rgba(255, 255, 255, 0.25),
-    transparent
-  );
+  background: linear-gradient(120deg,
+      transparent,
+      rgba(255, 255, 255, 0.25),
+      transparent);
   transition: left 0.6s ease;
 }
 
@@ -1331,6 +1079,7 @@ body {
 }
 
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0px);
@@ -1857,12 +1606,10 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent);
   animation: shine 3s infinite;
 }
 
@@ -1884,11 +1631,9 @@ body {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 20px;
-  background: linear-gradient(
-    135deg,
-    var(--light) 0%,
-    rgba(255, 255, 255, 0.7) 100%
-  );
+  background: linear-gradient(135deg,
+      var(--light) 0%,
+      rgba(255, 255, 255, 0.7) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1959,11 +1704,9 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(
-    circle at 50% 0%,
-    rgba(58, 134, 255, 0.1),
-    transparent 70%
-  );
+  background: radial-gradient(circle at 50% 0%,
+      rgba(58, 134, 255, 0.1),
+      transparent 70%);
   opacity: 0;
   transition: opacity 0.4s ease;
   z-index: -1;
@@ -2007,11 +1750,9 @@ body {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.3) 0%,
-    transparent 70%
-  );
+  background: radial-gradient(circle,
+      rgba(255, 255, 255, 0.3) 0%,
+      transparent 70%);
   opacity: 0;
   transition: opacity 0.4s;
   pointer-events: none;
@@ -2077,11 +1818,9 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(
-    circle at 30% 30%,
-    rgba(58, 134, 255, 0.15),
-    transparent 70%
-  );
+  background: radial-gradient(circle at 30% 30%,
+      rgba(58, 134, 255, 0.15),
+      transparent 70%);
   z-index: -1;
 }
 
@@ -2376,6 +2115,7 @@ body {
 }
 
 @keyframes typing {
+
   0%,
   100% {
     transform: translateY(0);
