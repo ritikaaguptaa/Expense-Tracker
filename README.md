@@ -8,7 +8,7 @@
 <div align="center">
 	<a target="_blank" href="#license" title="License: MIT"><img src="https://img.shields.io/badge/License-MIT-success.svg"></a>
 </div>
-
+<br>
 <div align="center">
 	<img src=".github/images/hero-section.png" alt="Finly Hero Image" />
 </div>
