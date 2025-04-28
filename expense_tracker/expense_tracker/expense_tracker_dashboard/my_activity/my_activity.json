@@ -1,7 +1,7 @@
 {
  "cards": [
   {
-   "card": "Avaliable Balance"
+   "card": "Current Balance"
   },
   {
    "card": "Total Dependents"
@@ -32,7 +32,7 @@
  "idx": 0,
  "is_default": 0,
  "is_standard": 1,
- "modified": "2025-04-28 11:27:10.758569",
+ "modified": "2025-04-28 11:53:25.782362",
  "modified_by": "Administrator",
  "module": "Expense Tracker",
  "name": "My Activity",
