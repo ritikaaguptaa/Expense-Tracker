@@ -16,7 +16,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Category Type",
-   "options": "Food\nTransport\nShopping\nEducation",
+   "options": "Food\nTransport\nShopping\nEducation\nEntertainment\nHealthcare\nGroceries\nRent\nUtilities\nInsurance\nSavings\nInvestments\nTravel\nFitness\nDining Out\nSubscriptions\nPersonal Care\nGifts\nCharity\nTaxes\nEmergency Fund\nChildren Expenses\nPet Care\nHome Maintenance\nPhone and Internet\nLoan Repayments",
    "reqd": 1
   },
   {
@@ -38,7 +38,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-04-06 11:45:43.196950",
+ "modified": "2025-04-29 00:40:08.832912",
  "modified_by": "Administrator",
  "module": "Expense Tracker",
  "name": "Expense Category",

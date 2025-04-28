@@ -213,26 +213,35 @@ async def transcribe_audio_async(file_url, chat_id):
 #         print(f"Error in transcription: {e}")
 #         return None
 
-
 def extract_details_from_text(text):
     """Uses Gemini AI to extract structured details from text."""
     try:
         genai.configure(api_key=GEMINI_API_KEY)
 
         prompt = f"""
-        Extract structured details from the following text:
+        You are an intelligent expense management assistant.
+
+        Analyze the following user input:
         "{text}"
 
-        Output the details in **strict** JSON format with these keys:
-        - amount (numeric, float)
-        - category (string, like Food, Transport, etc.)
-        - merchant (string, store or service name)
+        Strictly extract and output only these details in JSON format:
+        - amount (numeric, float, without currency symbols)
+        - category (one of the predefined categories listed below)
+        - merchant (store or service name; if not clear, leave as an empty string "")
 
-        Example output (no additional text, just JSON):
+        Allowed Categories:
+        Food, Transport, Shopping, Education, Entertainment, Healthcare, Groceries, Rent, Utilities, Insurance, Savings, Investments, Travel, Fitness, Dining Out, Subscriptions, Personal Care, Gifts, Charity, Taxes, Emergency Fund, Children Expenses, Pet Care, Home Maintenance, Phone and Internet, Loan Repayments
+
+        Important Instructions:
+        - ONLY use one of the allowed categories above. No new categories.
+        - Return output as PURE JSON only, no extra explanation or text.
+        - If information is missing, leave that key empty (but keep the JSON structure).
+
+        Example Output:
         {{
-            "amount": 120.50,
-            "category": "Food",
-            "merchant": "Dominos"
+            "amount": 250.00,
+            "category": "Transport",
+            "merchant": "Uber"
         }}
         """
 
