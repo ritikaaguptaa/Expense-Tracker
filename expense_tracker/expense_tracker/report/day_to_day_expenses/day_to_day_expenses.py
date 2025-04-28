@@ -30,7 +30,7 @@ def execute(filters=None):
         amount = row.amount or 0
 
         aggregated_data[user_id][date_str] += amount
-        all_dates.add(date_str)
+        all_dates.add(date_str) 
         user_ids.add(user_id)
 
     labels = sorted(all_dates)

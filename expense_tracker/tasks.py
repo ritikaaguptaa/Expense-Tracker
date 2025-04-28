@@ -416,7 +416,7 @@ def extract_and_notify(text, escaped_transcript, chat_id):
                     account_name = account_doc.name
                 elif is_family:
                     account_doc = frappe.get_doc("Family Member", {"telegram_id": chat_id})
-                    account_name = account_doc.name
+                    account_name = account_doc.primary_account_holder
 
                 expense = frappe.get_doc(
                     {
@@ -739,7 +739,7 @@ We'll automatically update your budgets accordingly ✅
                         parent_exists = frappe.db.exists("Primary Account", text)
 
                         if not parent_exists:
-                            message = "❌ Invalid Parent ID. Please try again."
+                            message = "❌ Invalid Account ID. Please try again."
                             escaped_message = (
                                 message.replace(".", "\\.")
                                 .replace("!", "\\!")
@@ -782,38 +782,17 @@ We'll automatically update your budgets accordingly ✅
 
                         elif user_role == "role_dependent":
                             if frappe.db.exists("Family Member", {"telegram_id": chat_id}):
-                                message = textwrap.dedent("""
-                                    👋 You’re now verified as a *Dependent User*.
-
-                                    Here’s what you can do directly from Telegram:
-
-                                    🔹 *Add Your Expenses* using voice commands  
-                                    🔹 *View Your Expense History* anytime  
-                                    🔹 *Receive Weekly Reports* of your spending  
-                                    🔹 *Get Reminders* to stay within your budget limits  
-                                    🔹 *Be Notified* if an expense is blocked due to category restrictions
-
-                                    Stay on top of your spending — all within Telegram.
-                                """)
-
+                                message = "✅ *You're already registered!* Start tracking your expenses now. 📊"
                                 escaped_message = (
                                     message.replace(".", "\\.")
                                     .replace("!", "\\!")
                                     .replace("_", "\\_")
                                 )
                                 send_telegram_message(chat_id, escaped_message)
+                                frappe.cache().delete_value(f"callback_{chat_id}")
+                                return {"ok": True} 
 
                             else:
-                                if frappe.db.exists("Family Member", {"telegram_id": chat_id}):
-                                    message = "✅ *You're already registered!* Start tracking your expenses now. 📊"
-                                    escaped_message = (
-                                        message.replace(".", "\\.")
-                                        .replace("!", "\\!")
-                                        .replace("_", "\\_")
-                                    )
-                                    send_telegram_message(chat_id, escaped_message)
-                                    return {"ok": True}
-
                                 main_user = frappe.get_doc("Primary Account", text)
 
                                 family_member_doc = frappe.get_doc(
@@ -833,7 +812,19 @@ We'll automatically update your budgets accordingly ✅
                                 main_user.save(ignore_permissions=True)
                                 frappe.db.commit()
 
-                                message = "🎉 *You are verified as a Dependent!* Now, track your expenses daily! 🏦"
+                                message = textwrap.dedent("""
+                                    🎉 *You are verified as a Dependent!*
+
+                                    Here’s what you can do directly from Telegram:
+
+                                    🔹 *Add Your Expenses* using voice commands  
+                                    🔹 *View Your Expense History* anytime  
+                                    🔹 *Receive Weekly Reports* of your spending  
+                                    🔹 *Get Reminders* to stay within your budget limits  
+                                    🔹 *Be Notified* if an expense is blocked due to category restrictions
+
+                                    Stay on top of your spending — all within Telegram.
+                                """)
                                 escaped_message = (
                                     message.replace(".", "\\.")
                                     .replace("!", "\\!")
