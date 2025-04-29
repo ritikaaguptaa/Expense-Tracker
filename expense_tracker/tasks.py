@@ -127,6 +127,11 @@ async def transcribe_audio_async(file_url, chat_id):
 
 
         await asyncio.sleep(2)
+        message1 = """
+Almost Done\\!
+"""
+        send_telegram_message(chat_id, message1)
+        time.sleep(2)
 
         try:
             response = await deepgram.transcription.prerecorded(
@@ -300,7 +305,7 @@ def extract_and_notify(text, escaped_transcript, chat_id):
         if extracted_details:
             amount = escape_markdown_v2(f"{extracted_details.get('amount', 'N/A'):.2f}")
             category = escape_markdown_v2(extracted_details.get("category", "N/A"))
-            merchant = escape_markdown_v2(extracted_details.get("merchant", "N/A"))
+            merchant = escape_markdown_v2(extracted_details.get("merchant") or "Not Specified")
 
             is_primary = frappe.db.exists("Primary Account", {"telegram_id": chat_id})
             is_family = frappe.db.exists("Family Member", {"telegram_id": chat_id})
