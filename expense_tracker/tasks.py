@@ -262,8 +262,6 @@ def extract_details_from_text(text):
         }}
         """
 
-
-
         model = genai.GenerativeModel("gemini-1.5-pro-latest")
         response = model.generate_content(prompt)
 
@@ -690,6 +688,31 @@ We'll automatically update your budgets accordingly ✅
                 )
                 send_telegram_message_with_keyboard(chat_id, escaped_message, keyboard)
 
+            elif text == "/set_auto_expense":
+                if frappe.db.exists("Primary Account", {"telegram_id": chat_id}):
+                    auto_expense_message = textwrap.dedent("""
+                        🎤 *Auto-Log Your Recurring Expense*  
+                        Just send a voice note with the details.
+
+                        For example:  
+                        "Log my rent of $500 every month under the Rent category."
+
+                        Please mention:  
+                        • Category  
+                        • Amount  
+                        • Frequency (e.g., Monthly, Weekly)
+
+                        We'll take care of the rest — automatically. ✨
+                    """)
+
+                    escaped_message = auto_expense_message.replace(".", "\\.").replace("!", "\\!").replace("_", "\\*")  
+                    send_telegram_message(chat_id, escaped_message)
+                    frappe.cache().set_value(f"set_auto_expense_{chat_id}", True)
+                    return
+                else:
+                    send_telegram_message(chat_id, "❌ This feature isn’t available on your account.\nIf you think this is a mistake, feel free to reach out to our team.")
+                    return
+
             elif "voice" in data["message"]:
                 if frappe.cache.get_value(f"set_budget_{chat_id}"):
                     voice_file_id = data["message"]["voice"]["file_id"]
@@ -698,6 +721,15 @@ We'll automatically update your budgets accordingly ✅
                     transcript = transcribe_voice_note_sync_wrapper(file_url)
                     process_budget_transcription(chat_id, transcript)
                     frappe.cache.delete_value(f"set_budget_{chat_id}")
+                    return
+                
+                if frappe.cache.get_value(f"set_auto_expense_{chat_id}"):
+                    voice_file_id = data["message"]["voice"]["file_id"]
+                    file_url = get_telegram_file_url(voice_file_id)
+
+                    transcript = transcribe_voice_note_sync_wrapper(file_url)
+                    process_auto_expense_transcription(chat_id, transcript)
+                    frappe.cache.delete_value(f"set_auto_expense_{chat_id}")
                     return
 
                 primary_exist = frappe.db.exists(
@@ -1156,6 +1188,96 @@ def store_budget(chat_id, extracted_data):
     except Exception as e:
         frappe.log_error(f"Unexpected error in store_budget: {e}")
         send_telegram_message(chat_id, es_markdown_v2(f"❌ *Error:* Failed to process budget. {str(e)}"))
+
+@frappe.whitelist()
+def process_auto_expense_transcription(chat_id, transcript):
+    message1 = (
+        "⏳ *Hold Tight!* We're analyzing your voice command and preparing your recurring expense details.\n\n"
+        "This will only take a moment. 💡"
+    )
+
+    send_telegram_message(chat_id, es_markdown_v2(message1))
+
+    prompt = f"""
+    Extract the following details from the "{transcript}" in strict JSON format. Ensure that the values are extracted with 100% accuracy, adhering to the exact structure defined below:
+
+    - Category: The type of expense (e.g., Rent, Subscription, Groceries, Utilities, etc.). The category should be selected from the following predefined list: "Rent", "Subscription", "Groceries", "Utilities", "Other".
+    - Amount: The total amount of the expense (e.g., $500). The amount should be represented as a numerical value, excluding the dollar sign and any commas.
+    - Frequency: The recurrence frequency of the expense (e.g., Monthly, Weekly, Yearly). Use the following valid values: "Monthly", "Weekly", "Yearly".
+
+    Ensure that:
+    - The category matches exactly one of the valid options.
+    - The amount is correctly parsed as a floating-point number.
+    - The frequency is one of the valid recurrence types.
+
+    JSON Structure Example:
+    {
+      "category": "Rent",
+      "amount": 500.0,
+      "frequency": "Monthly"
+    }
+
+    Return the result strictly in the above JSON format, with no additional explanation, metadata, or other text.
+    """
+
+    try:
+        model = genai.GenerativeModel("gemini-1.5-pro-latest")
+        response = model.generate_content(prompt)
+        extracted_data_str = response.text.strip()
+
+        try:
+            details = json.loads(extracted_data_str)
+        except json.JSONDecodeError:
+            cleaned_json = re.sub(r"```json|```", "", extracted_data_str).strip()
+            try:
+                details = json.loads(cleaned_json)
+            except json.JSONDecodeError as e:
+                send_telegram_message(chat_id, es_markdown_v2("❌ *Error:* Couldn't understand your recurring expense. Try again with clear category, amount, and frequency details."))
+                return
+
+        time.sleep(4)
+        store_auto_expense(chat_id, details)
+
+    except Exception as e:
+        frappe.log_error(f"Error during Gemini processing: {e}", "Auto Expense Transcription")
+        send_telegram_message(chat_id, es_markdown_v2("❌ *Error:* There was an issue processing your request. Please try again later."))
+
+
+def store_auto_expense(chat_id, details):
+    if details:
+        category = details.get("category")
+        amount = details.get("amount")
+        frequency = details.get("frequency")
+
+        if category and amount and frequency:
+            primary_account = frappe.get_doc("Primary Account", {"telegram_id": chat_id})
+            user_id = primary_account.name if primary_account else None
+
+            if not user_id:
+                send_telegram_message(chat_id, es_markdown_v2("❌ *Account not found.* Please ensure your account is verified to continue."))
+                return
+            
+            expense_doc = frappe.get_doc({
+                "doctype": "Recurring Expense",
+                "user_id": user_id,
+                "telegram_id": chat_id,
+                "category": category,
+                "amount": amount,
+                "frequency": frequency,
+                "is_active": 1,  
+            })
+
+            expense_doc.insert(ignore_permissions=True)
+            frappe.db.commit()
+
+            send_telegram_message(chat_id, es_markdown_v2(
+                f"✅ *Recurring expense added successfully!*\n\n"
+                f"• *Category:* {category}\n"
+                f"• *Amount:* {amount}\n"
+                f"• *Frequency:* {frequency}"
+            ))
+        else:
+           send_telegram_message(chat_id, es_markdown_v2("❌ *Sorry,* we couldn't process your request due to missing or incomplete information. Please try again with clear details."))
 
 def generate_and_send_report(chat_id):
     try:
