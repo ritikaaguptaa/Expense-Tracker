@@ -705,7 +705,7 @@ We'll automatically update your budgets accordingly ✅
                         We'll take care of the rest — automatically. ✨
                     """)
 
-                    escaped_message = auto_expense_message.replace(".", "\\.").replace("!", "\\!").replace("_", "\\*")  
+                    escaped_message = es_markdown_v2(auto_expense_message)
                     send_telegram_message(chat_id, escaped_message)
                     frappe.cache().set_value(f"set_auto_expense_{chat_id}", True)
                     return
