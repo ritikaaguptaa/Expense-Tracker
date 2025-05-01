@@ -29,7 +29,10 @@
             fill="white" style="filter: brightness(0) invert(1);" />
 
         </div>
-        Finly
+        <img src="../../public/finly.png" alt="Finly Logo"
+          width="100" height="30"
+          style="filter: brightness(0) invert(1); margin-left: -10%;" />
+
       </a>
 
       <div class="nav-links">
@@ -406,13 +409,12 @@
                     <div class="message-text" style="display: none;">
                       <strong>Transcription Complete!</strong><br />
                       "I spent two hundred on Uber."<br /><br />
-                      <strong>Expense Details Extracted</strong><br />
-                      <span class="expense-item">Amount: $200.00</span><br />
+                      <strong>Expense Summary</strong><br />
+                      <span class="expense-item">Amount: ₹ 200.00</span><br />
                       <span class="expense-item">Category: Transport</span><br />
                       <span class="expense-item">Merchant: Uber</span><br /><br />
-                      This record has been automatically saved in the Expense
-                      Doctype!<br />
-                      <em>Effortless tracking for smarter spending!</em>
+                      Your expense has been successfully recorded.<br />
+                      <em>Stay on top of your finances with effortless tracking!</em>
                     </div>
                   </div>
                 </div>
@@ -870,7 +872,7 @@ body {
 .logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  /* gap: 12px; */
   font-size: 1.8rem;
   font-weight: 700;
   font-family: "Amazon Ember", "Helvetica Neue", Arial, "Roboto", "Open Sans", sans-serif;
@@ -1906,15 +1908,19 @@ body {
 
 .phone-notch {
   position: absolute;
-  top: 0;
+  top: 3%;
   left: 50%;
-  transform: translateX(-50%);
-  width: 150px;
-  height: 30px;
+  transform: translate(-50%);
+  /* width: 150px; */
+  height: 25px;
   background-color: #1e1f2e;
-  border-bottom-left-radius: 16px;
-  border-bottom-right-radius: 16px;
+  border-bottom-left-radius: 32px;
+  border-top-right-radius: 32px;
+  border-top-left-radius: 32px;
+  border-bottom-right-radius: 32px;
+  width: 30%;
   z-index: 1;
+
 }
 
 .phone-button {
@@ -2063,6 +2069,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  scrollbar-width: none;
 }
 
 .chat-message {
