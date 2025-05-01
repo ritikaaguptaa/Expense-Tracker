@@ -231,16 +231,28 @@ def extract_details_from_text(text):
 
         Strictly extract and output only these details in JSON format:
         - amount (numeric, float, without currency symbols)
-        - category (one of the predefined categories listed below)
+        - category (map specific activities to one of the 9 main categories listed below)
         - merchant (store or service name; if not clear, leave as an empty string "")
 
-        Allowed Categories:
-        Food, Transport, Shopping, Education, Entertainment, Healthcare, Groceries, Rent, Utilities, Insurance, Savings, Investments, Travel, Fitness, Dining Out, Subscriptions, Personal Care, Gifts, Charity, Taxes, Emergency Fund, Children Expenses, Pet Care, Home Maintenance, Phone and Internet, Loan Repayments
+        Allowed Categories (only these must appear in the output):
+        Food, Transport, Shopping, Healthcare, Education, Entertainment, Bills & Utilities, Savings & Investments, Travel
+
+        Category Mapping Rules (examples):
+        - "Dining Out", "Fast Food", "Groceries" → "Food"
+        - "Taxi", "Uber", "Train", "Fuel" → "Transport"
+        - "Amazon", "Clothing", "Accessories", "Electronics" → "Shopping"
+        - "Doctor", "Pharmacy", "Medicine", "Hospital" → "Healthcare"
+        - "Tuition", "Books", "Online Course", "Exam Fee" → "Education"
+        - "Netflix", "Movies", "Concerts", "Spotify" → "Entertainment"
+        - "Rent", "Electricity", "Internet", "Phone", "Water" → "Bills & Utilities"
+        - "Mutual Funds", "Stocks", "Savings Account" → "Savings & Investments"
+        - "Flight", "Hotel", "Vacation" → "Travel"
 
         Important Instructions:
-        - ONLY use one of the allowed categories above. No new categories.
+        - Only use one of the 9 categories listed above.
+        - If the category cannot be determined with reasonable certainty, leave it as an empty string.
         - Return output as PURE JSON only, no extra explanation or text.
-        - If information is missing, leave that key empty (but keep the JSON structure).
+        - If any field is missing, leave that key empty (but keep the JSON structure).
 
         Example Output:
         {{
@@ -249,6 +261,8 @@ def extract_details_from_text(text):
             "merchant": "Uber"
         }}
         """
+
+
 
         model = genai.GenerativeModel("gemini-1.5-pro-latest")
         response = model.generate_content(prompt)
@@ -415,12 +429,12 @@ def extract_and_notify(text, escaped_transcript, chat_id):
 
             message = f"""
 🎙️ *Transcription Complete\!*\n\n*{escaped_transcript}*\n\n
-💡 *Expense Details Extracted* 💡\n\n
+💡 *Expense Summary* 💡\n\n
 💰 *Amount:* {amount}  \n
 📂 *Category:* {category}  \n
 🏪 *Merchant:* {merchant}  \n\n
-✅ *This record has been automatically saved in the Expense Doctype\!*\n\n
-📊 _Effortless tracking for smarter spending\!_ \n            
+✅ *Your expense has been successfully recorded\.*\n\n
+📊 _Stay on top of your finances with effortless tracking\!_ \n            
 
 """
 
@@ -772,6 +786,7 @@ We'll automatically update your budgets accordingly ✅
                                 🔹 *Check Your Balance* and *Add Money* seamlessly  
                                 🔹 *Receive Weekly Summaries* of your spending  
                                 🔹 *Set Monthly Budgets* by category via voice  
+                                🔹 *Auto-Log Recurring Expenses* by sending `/set_auto_expense`
                                 🔹 *Get Notified* if a dependent tries to log expenses in unapproved categories  
 
                                 To explore complete insights, manage your dependents, and configure categories:  
