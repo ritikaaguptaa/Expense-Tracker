@@ -1198,6 +1198,7 @@ def process_auto_expense_transcription(chat_id, transcript):
 
     send_telegram_message(chat_id, es_markdown_v2(message1))
 
+    # Escape the curly braces in the JSON example by doubling them
     prompt = f"""
     Extract the following details from the following user input in strict JSON format. Ensure that the values are extracted with 100% accuracy, adhering to the exact structure defined below:
 
@@ -1214,11 +1215,11 @@ def process_auto_expense_transcription(chat_id, transcript):
     - The frequency is one of the valid recurrence types.
 
     JSON Structure Example:
-    {
+    {{
       "category": "Rent",
       "amount": 500.0,
       "frequency": "Monthly"
-    }
+    }}
 
     Return the result strictly in the above JSON format, with no additional explanation, metadata, or other text.
     """
@@ -1244,7 +1245,6 @@ def process_auto_expense_transcription(chat_id, transcript):
     except Exception as e:
         frappe.log_error(f"Error during Gemini processing: {e}", "Auto Expense Transcription")
         send_telegram_message(chat_id, es_markdown_v2("❌ *Error:* There was an issue processing your request. Please try again later."))
-
 
 def store_auto_expense(chat_id, details):
     if details:
