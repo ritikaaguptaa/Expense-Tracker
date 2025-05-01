@@ -1199,7 +1199,10 @@ def process_auto_expense_transcription(chat_id, transcript):
     send_telegram_message(chat_id, es_markdown_v2(message1))
 
     prompt = f"""
-    Extract the following details from the "{transcript}" in strict JSON format. Ensure that the values are extracted with 100% accuracy, adhering to the exact structure defined below:
+    Extract the following details from the following user input in strict JSON format. Ensure that the values are extracted with 100% accuracy, adhering to the exact structure defined below:
+
+    **User Input:**
+    \"{transcript}\"
 
     - Category: The type of expense (e.g., Rent, Subscription, Groceries, Utilities, etc.). The category should be selected from the following predefined list: "Rent", "Subscription", "Groceries", "Utilities", "Other".
     - Amount: The total amount of the expense (e.g., $500). The amount should be represented as a numerical value, excluding the dollar sign and any commas.
@@ -1255,6 +1258,14 @@ def store_auto_expense(chat_id, details):
 
             if not user_id:
                 send_telegram_message(chat_id, es_markdown_v2("❌ *Account not found.* Please ensure your account is verified to continue."))
+                return
+
+            valid_categories = frappe.get_all("Expense Category", filters={"associated_account_holder": primary_account.name}, fields=["category_type"])
+
+            valid_category_names = [category_doc.get("category_type") for category_doc in valid_categories]
+
+            if category not in valid_category_names:
+                send_telegram_message(chat_id, es_markdown_v2(f"❌ *The category '{category}' is not valid for your account.* Please choose from the available categories."))
                 return
             
             expense_doc = frappe.get_doc({
