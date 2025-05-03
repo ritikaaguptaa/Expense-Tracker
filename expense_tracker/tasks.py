@@ -377,7 +377,7 @@ def extract_and_notify(text, escaped_transcript, chat_id):
 
                     if category not in allowed_categories:
                         warning_message = f"⚠️ *Unrecognized Category!* The category '{category}' is not listed under your approved expense categories."
-                        escaped_message = warning_message.replace(".", "\\.").replace("!", "\\!").replace("_", "\\_")
+                        escaped_message = es_markdown_v2(warning_message)
                         send_telegram_message(chat_id, escaped_message)
                         return
                     else:
@@ -397,9 +397,13 @@ def extract_and_notify(text, escaped_transcript, chat_id):
             if is_primary:
                 try:
                     primary_account = frappe.get_doc("Primary Account", {"telegram_id": chat_id})
-                    primary_account.salary -= extracted_details.get("amount", 0.0)
-                    primary_account.save(ignore_permissions=True)
-                    frappe.db.commit()
+                    if primary_account.salary >= extracted_details.get("amount", 0.0):
+                        primary_account.salary -= extracted_details.get("amount", 0.0)
+                        primary_account.save(ignore_permissions=True)
+                        frappe.db.commit()
+                    else:
+                        send_telegram_message(chat_id, es_markdown_v2("⚠️ *Insufficient salary funds!* Please check your account."))
+                        return
                 except Exception as e:
                     frappe.log_error(f"Error updating primary account balance: {str(e)}")
             elif is_family:
@@ -410,7 +414,7 @@ def extract_and_notify(text, escaped_transcript, chat_id):
                         family_member.save(ignore_permissions=True)
                         frappe.db.commit()
                     else:
-                        send_telegram_message(chat_id, "⚠️ *Insufficient pocket money!* Please request more funds.")
+                        send_telegram_message(chat_id, es_markdown_v2("⚠️ *Insufficient pocket money!* Please request more funds."))
                         return
                 except Exception as e:
                     frappe.log_error(f"Error updating family member pocket money: {str(e)}")
