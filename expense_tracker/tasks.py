@@ -359,9 +359,32 @@ def extract_and_notify(text, escaped_transcript, chat_id):
                         )
                         expense_category_type_doc = frappe.get_doc("Expense Category", expense_category_name)
                         
-                        expense_category_type_doc.budget -= extracted_details.get("amount", 0.0)
-                        expense_category_type_doc.save(ignore_permissions=True)
-                        frappe.db.commit()
+                        amount = float(extracted_details.get("amount", 0.0))
+                        if expense_category_type_doc.budget >= amount:
+                            expense_category_type_doc.budget -= extracted_details.get("amount", 0.0)
+                            expense_category_type_doc.save(ignore_permissions=True)
+                            frappe.db.commit()
+                        else:
+                            message = textwrap.dedent(f"""
+                                *Budget Limit Reached*
+
+                                💸 {family_member_doc.full_name} tried to spend ₹{amount:.2f} in the *{category}* category,
+                                but the remaining budget is only ₹{expense_category_type_doc.budget:.2f}.
+
+                                ⚠️ This transaction has been declined to maintain control over shared expenses.
+
+                                🔔 Consider topping up the category budget or discussing spending priorities.
+                            """)
+
+                            dependent_message = textwrap.dedent(f"""
+                                *Transaction Declined*
+
+                                Unfortunately, your attempt to spend ₹{amount:.2f} in *{category}* was not successful. 
+                                The remaining budget is only ₹{expense_category_type_doc.budget:.2f}.
+                            """)
+                            send_telegram_message(chat_id, es_markdown_v2(dependent_message))
+                            send_telegram_message(primary_account_doc.telegram_id, es_markdown_v2(message))
+                            return
                 except Exception as e:
                     frappe.log_error(f"Error processing family member transaction: {str(e)}")
 
@@ -392,9 +415,24 @@ def extract_and_notify(text, escaped_transcript, chat_id):
                         )
                         expense_category_type_doc = frappe.get_doc("Expense Category", expense_category_name)
 
-                        expense_category_type_doc.budget -= float(extracted_details.get("amount", 0.0))
-                        expense_category_type_doc.save(ignore_permissions=True)
-                        frappe.db.commit()
+                        amount = float(extracted_details.get("amount", 0.0))
+                        if expense_category_type_doc.budget >= amount:
+                            expense_category_type_doc.budget -= amount
+                            expense_category_type_doc.save(ignore_permissions=True)
+                            frappe.db.commit()
+                        else:
+                            message =  textwrap.dedent(f"""
+                                *Budget Limit Alert*
+
+                                ✨ You attempted to spend ₹{amount:.2f} in the *{category}* category,
+                                but your available budget is only ₹{expense_category_type_doc.budget:.2f}.
+
+                                📉 *Transaction Declined* to help you stay within your personalized spending limits.
+
+                                💬 Need more flexibility? Tap into your financial plan or request a balance update.
+                            """)
+                            send_telegram_message(chat_id, es_markdown_v2(message))
+                            return
                 except Exception as e:
                     frappe.log_error(f"Error processing primary account transaction: {str(e)}")
 
@@ -406,7 +444,7 @@ def extract_and_notify(text, escaped_transcript, chat_id):
                         primary_account.save(ignore_permissions=True)
                         frappe.db.commit()
                     else:
-                        send_telegram_message(chat_id, es_markdown_v2("⚠️ *Insufficient salary funds!* Please check your account."))
+                        send_telegram_message(chat_id, es_markdown_v2("⚠️ *Insufficient Balance!* Please check your account."))
                         return
                 except Exception as e:
                     frappe.log_error(f"Error updating primary account balance: {str(e)}")
