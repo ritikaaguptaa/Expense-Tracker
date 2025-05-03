@@ -29,8 +29,7 @@
             fill="white" style="filter: brightness(0) invert(1);" />
 
         </div>
-        <img src="../../public/finly.png" alt="Finly Logo"
-          width="100" height="30"
+        <img src="../../public/finly.png" alt="Finly Logo" width="100" height="30"
           style="filter: brightness(0) invert(1); margin-left: -10%;" />
 
       </a>
@@ -565,7 +564,8 @@
               <img src="../../public/finly_whisper_weallth.png" alt="Finly Logo" width="30" height="30"
                 style="filter: brightness(0) invert(1);" />
             </div>
-            Finly
+            <img src="../../public/finly.png" alt="Finly Logo" width="100" height="30"
+              style="filter: brightness(0) invert(1); margin-left: -5%;" />
           </a>
           <p class="footer-tagline" ref="tagline">
             AI-powered expense management for smarter financial decisions.
