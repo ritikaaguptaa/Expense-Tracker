@@ -296,3 +296,71 @@ def get_alert_message(category_name, remaining, level):
 
 _{'Please avoid further expenses in this category.' if level == 'critical' else 'Keep an eye on your spending here.'}_
     """.strip()
+
+@frappe.whitelist(allow_guest=True)
+def process_weekly_expenses():
+    process_recurring_expenses_by_frequency("weekly")
+
+@frappe.whitelist(allow_guest=True)
+def process_biweekly_expenses():
+    process_recurring_expenses_by_frequency("biweekly")
+
+@frappe.whitelist(allow_guest=True)
+def process_bimonthly_expenses():
+    process_recurring_expenses_by_frequency("bimonthly")
+
+@frappe.whitelist(allow_guest=True)
+def process_monthly_expenses():
+    process_recurring_expenses_by_frequency("monthly")
+
+@frappe.whitelist(allow_guest=True)
+def process_yearly_expenses():
+    process_recurring_expenses_by_frequency("yearly")
+
+
+def process_recurring_expenses_by_frequency(frequency):
+    recurring_expenses = frappe.get_all(
+        "Recurring Expense",
+        filters={"frequency": frequency, "is_active": 1},
+        fields=["name", "user_id", "telegram_id", "category", "amount", "merchant"]
+    )
+
+    for expense in recurring_expenses:
+        try:
+            user = frappe.get_doc("Primary Account", expense["user_id"])
+            salary = user.salary
+            if salary < expense["amount"]:
+                send_telegram_message(expense["telegram_id"], es_markdown_v2(
+                    "⚠️ *Insufficient Funds!*\n\nYou don’t have enough balance to log your recurring expense this time."
+                ))
+                continue
+
+            user.salary -= expense["amount"]
+            user.save(ignore_permissions=True)
+
+            # Create Expense entry
+            frappe.get_doc({
+                "doctype": "Expense",
+                "account_holder": expense["user_id"],
+                "user_id": expense["telegram_id"],
+                "category": expense["category"],
+                "amount": expense["amount"],
+                "merchant": expense["merchant"],
+                "payment_mode": "UPI",
+                "source": "Telegram Bot",
+                "date": frappe.utils.now_datetime(),
+            }).insert(ignore_permissions=True)
+            frappe.db.commit()
+
+            send_telegram_message(expense["telegram_id"], es_markdown_v2(
+                f"💸 *Recurring Expense Logged!*\n\n"
+                f"• *Category:* {expense['category']}\n"
+                f"• *Amount:* ₹{expense['amount']}\n"
+                f"• *Merchant:* {expense['merchant'] or 'Not Specified'}\n"
+                f"• *Remaining Balance:* ₹{user.salary}\n\n"
+                f"🔁 _Logged automatically as part of your {frequency} recurring plan._"
+            ))
+
+        except Exception as e:
+            frappe.log_error(f"Scheduler error for {expense['name']}: {e}", "Recurring Expense Scheduler")
+
