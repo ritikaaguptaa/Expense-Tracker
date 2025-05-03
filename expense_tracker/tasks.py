@@ -1198,31 +1198,48 @@ def process_auto_expense_transcription(chat_id, transcript):
 
     send_telegram_message(chat_id, es_markdown_v2(message1))
 
-    # Escape the curly braces in the JSON example by doubling them
     prompt = f"""
-    Extract the following details from the following user input in strict JSON format. Ensure that the values are extracted with 100% accuracy, adhering to the exact structure defined below:
+    You are an intelligent recurring expense management assistant.
 
-    **User Input:**
-    \"{transcript}\"
+    Analyze the following user command:
+    "{transcript}"
 
-    - Category: The type of expense (e.g., Rent, Subscription, Groceries, Utilities, etc.). The category should be selected from the following predefined list: "Rent", "Subscription", "Groceries", "Utilities", "Other".
-    - Amount: The total amount of the expense (e.g., $500). The amount should be represented as a numerical value, excluding the dollar sign and any commas.
-    - Frequency: The recurrence frequency of the expense (e.g., Monthly, Weekly, Yearly). Use the following valid values: "Monthly", "Weekly", "Yearly".
+    Your task is to extract the following fields from the input for automatic recurring expense logging:
 
-    Ensure that:
-    - The category matches exactly one of the valid options.
-    - The amount is correctly parsed as a floating-point number.
-    - The frequency is one of the valid recurrence types.
+    Output a JSON object with the following keys:
+    - amount (numeric float, without currency symbols)
+    - category (must strictly match one of the 9 predefined categories below)
+    - merchant (store, landlord, or service name; if not clear, leave as an empty string "")
+    - frequency (set to "monthly" unless the user specifies otherwise like "weekly", "bimonthly", "biweekly", "yearly")
 
-    JSON Structure Example:
+    Allowed Categories (choose the most appropriate one):
+    Food, Transport, Shopping, Healthcare, Education, Entertainment, Bills & Utilities, Savings & Investments, Travel
+
+    Category Mapping Rules (examples):
+    - "Rent", "Home Rent", "House Rent" → Bills & Utilities
+    - "Groceries", "Dining", "Fast Food" → Food
+    - "Flight", "Hotel", "Trip", "Vacation" → Travel
+    - "Netflix", "Subscription", "Movies", "Spotify" → Entertainment
+    - "Tuition", "Books", "Courses" → Education
+    - "Medicine", "Hospital", "Pharmacy" → Healthcare
+    - "Fuel", "Taxi", "Uber", "Train" → Transport
+    - "Amazon", "Clothing", "Shopping", "Gadgets" → Shopping
+    - "SIP", "Mutual Fund", "Stocks", "Investment" → Savings & Investments
+
+    Important:
+    - Use only one of the 9 allowed categories.
+    - If the frequency is not explicitly mentioned, default to "monthly".
+    - If the merchant is not clear, leave the field as an empty string "".
+    - Return response strictly as pure JSON with no extra text or explanation.
+
+    Example Output:
     {{
-      "category": "Rent",
-      "amount": 500.0,
-      "frequency": "Monthly"
+        "amount": 10000.0,
+        "category": "Bills & Utilities",
+        "merchant": ""
+        "frequency": "monthly"
     }}
-
-    Return the result strictly in the above JSON format, with no additional explanation, metadata, or other text.
-    """
+    """ 
 
     try:
         model = genai.GenerativeModel("gemini-1.5-pro-latest")
@@ -1251,7 +1268,8 @@ def store_auto_expense(chat_id, details):
         category = details.get("category")
         amount = details.get("amount")
         frequency = details.get("frequency")
-
+        merchant = escape_markdown_v2(details.get("merchant") or "Not Specified")
+        
         if category and amount and frequency:
             primary_account = frappe.get_doc("Primary Account", {"telegram_id": chat_id})
             user_id = primary_account.name if primary_account else None
@@ -1274,6 +1292,7 @@ def store_auto_expense(chat_id, details):
                 "telegram_id": chat_id,
                 "category": category,
                 "amount": amount,
+                "merchant": merchant,
                 "frequency": frequency,
                 "is_active": 1,  
             })
@@ -1285,6 +1304,7 @@ def store_auto_expense(chat_id, details):
                 f"✅ *Recurring expense added successfully!*\n\n"
                 f"• *Category:* {category}\n"
                 f"• *Amount:* {amount}\n"
+                f"• *Merchant:* {merchant}\n"
                 f"• *Frequency:* {frequency}"
             ))
         else:

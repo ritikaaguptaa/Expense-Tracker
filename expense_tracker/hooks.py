@@ -161,15 +161,27 @@ scheduler_events = {
 # 	"hourly": [
 # 		"expense_tracker.tasks.hourly"
 # 	],
-	# "weekly": [
-	# 	"expense_tracker.tasks.weekly_spending_summary"
-	# ],
+	"weekly": [
+		"expense_tracker.scheduler.send_weekly_parent_spending_summary",
+        "expense_tracker.scheduler.send_weekly_family_spending_summary",
+        "expense_tracker.scheduler.process_weekly_expenses",
+	],
 	"monthly": [
 		"expense_tracker.scheduler.monthly_add_money_reminder",
-        "expense_tracker.scheduler.send_weekly_parent_spending_summary",
-        "expense_tracker.scheduler.send_weekly_family_spending_summary",
-		"expense_tracker.scheduler.notify_dependents_about_savings"
+		"expense_tracker.scheduler.notify_dependents_about_savings",
+        "expense_tracker.scheduler.process_monthly_expenses",
 	],
+    "cron": {
+        "0 0 1 */2 *": [
+            "expense_tracker.scheduler.process_bimonthly_expenses",
+        ],
+        "0 0 1 1 *": [
+            "expense_tracker.scheduler.process_yearly_expenses",
+        ],
+        "0 0 */14 * *": [
+            "expense_tracker.scheduler.process_biweekly_expenses",
+        ],
+    }
 }
 
 # Testing

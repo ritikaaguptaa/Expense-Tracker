@@ -11,6 +11,7 @@
   "expense_summary_section",
   "category",
   "amount",
+  "merchant",
   "column_break_v7jz",
   "frequency",
   "start_date",
@@ -73,12 +74,17 @@
    "fieldname": "user_details_section",
    "fieldtype": "Section Break",
    "label": "User Details"
+  },
+  {
+   "fieldname": "merchant",
+   "fieldtype": "Data",
+   "label": "Merchant"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-05-01 12:23:04.532772",
+ "modified": "2025-05-03 09:48:06.123678",
  "modified_by": "Administrator",
  "module": "Expense Tracker",
  "name": "Recurring Expense",
