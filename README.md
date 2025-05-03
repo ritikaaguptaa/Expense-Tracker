@@ -82,14 +82,19 @@ You can follow the official [Frappe installation guide](https://docs.frappe.io/f
 
 ### Steps
 
-```bash
+```
 cd your-bench-directory
+```
 
+```
 bench get-app finly https://github.com/Siddharthkhati/Finly-Whisper-Wealth.git
 
 bench --site your-site-name install-app expense_tracker
+```
 
+```
 bench start
+```
 
 <br>
 <br>
