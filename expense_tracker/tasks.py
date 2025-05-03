@@ -827,11 +827,7 @@ We'll automatically update your budgets accordingly ✅
                                 Stay in control — effortlessly.
                             """)
 
-                            escaped_message = (
-                                message.replace(".", "\\.")
-                                .replace("!", "\\!")
-                                .replace("_", "\\_")
-                            )
+                            escaped_message = es_markdown_v2(message)
 
                             primary_account_doc = frappe.get_doc("Primary Account", text)
                             primary_account_doc.telegram_id = chat_id  
@@ -886,11 +882,7 @@ We'll automatically update your budgets accordingly ✅
 
                                     Stay on top of your spending — all within Telegram.
                                 """)
-                                escaped_message = (
-                                    message.replace(".", "\\.")
-                                    .replace("!", "\\!")
-                                    .replace("_", "\\_")
-                                )
+                                escaped_message = es_markdown_v2(message)
                                 send_telegram_message(chat_id, escaped_message)
 
                     elif user_role == "add_money":
