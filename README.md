@@ -71,14 +71,25 @@ You can directly start using Finly by visiting:
 
 No installations, no hassle — sign up and start managing your finances with AI superpowers.
 
-### Self-Hosting
+## 🛠️ Development Setup
 
-Want to host your own instance of Finly?  
-Stay tuned! We are working to open source the deployment scripts soon.
+To run Finly locally for development:
 
-(Interested early adopters: [Join our waitlist](https://finly.finance/waitlist))
+### Prerequisites
 
----
+Ensure you have a working **Frappe bench** installed.  
+You can follow the official [Frappe installation guide](https://docs.frappe.io/framework/user/en/installation) to set up your environment.
+
+### Steps
+
+```bash
+cd your-bench-directory
+
+bench get-app finly https://github.com/Siddharthkhati/Finly-Whisper-Wealth.git
+
+bench --site your-site-name install-app expense_tracker
+
+bench start
 
 <br>
 <br>
