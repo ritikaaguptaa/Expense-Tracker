@@ -350,13 +350,15 @@ def extract_and_notify(text, escaped_transcript, chat_id):
                         send_telegram_message(primary_account_doc.telegram_id, parent_escaped_message)
                         return
                     else:
-                        expense_category_type_doc = frappe.get_doc(
+                        expense_category_name = frappe.get_value(
                             "Expense Category",
-                            filters={
-                                "associated_account_holder": primary_account_holder_id,
+                            {
+                                "associated_account_holder": primary_account_doc.name,
                                 "category_type": category,
-                            },
+                            }
                         )
+                        expense_category_type_doc = frappe.get_doc("Expense Category", expense_category_name)
+                        
                         expense_category_type_doc.budget -= extracted_details.get("amount", 0.0)
                         expense_category_type_doc.save(ignore_permissions=True)
                         frappe.db.commit()
@@ -381,13 +383,15 @@ def extract_and_notify(text, escaped_transcript, chat_id):
                         send_telegram_message(chat_id, escaped_message)
                         return
                     else:
-                        expense_category_type_doc = frappe.get_doc(
+                        expense_category_name = frappe.get_value(
                             "Expense Category",
-                            filters={
+                            {
                                 "associated_account_holder": primary_account_doc.name,
                                 "category_type": category,
-                            },
+                            }
                         )
+                        expense_category_type_doc = frappe.get_doc("Expense Category", expense_category_name)
+
                         expense_category_type_doc.budget -= float(extracted_details.get("amount", 0.0))
                         expense_category_type_doc.save(ignore_permissions=True)
                         frappe.db.commit()
