@@ -444,7 +444,25 @@ def extract_and_notify(text, escaped_transcript, chat_id):
                         primary_account.save(ignore_permissions=True)
                         frappe.db.commit()
                     else:
-                        send_telegram_message(chat_id, es_markdown_v2("⚠️ *Insufficient Balance!* Please check your account."))
+                        expense_category_name = frappe.get_value(
+                            "Expense Category",
+                            {
+                                "associated_account_holder": primary_account.name,
+                                "category_type": category,
+                            }
+                        )
+                        expense_category_type_doc = frappe.get_doc("Expense Category", expense_category_name)
+                        
+                        expense_category_type_doc.budget += extracted_details.get("amount", 0.0)
+                        expense_category_type_doc.save(ignore_permissions=True)
+                        frappe.db.commit()
+
+                        keyboard_pm = [
+                            [{"text": "💰 Check Balance", "callback_data": "check_balance"}],
+                            [{ "text": "➕ Add Money", "callback_data": "add_money"}]
+                        ]
+                        
+                        send_telegram_message_with_keyboard(chat_id, es_markdown_v2("⚠️ *Insufficient Balance!* Please check your account."), keyboard_pm)
                         return
                 except Exception as e:
                     frappe.log_error(f"Error updating primary account balance: {str(e)}")
@@ -456,7 +474,26 @@ def extract_and_notify(text, escaped_transcript, chat_id):
                         family_member.save(ignore_permissions=True)
                         frappe.db.commit()
                     else:
-                        send_telegram_message(chat_id, es_markdown_v2("⚠️ *Insufficient pocket money!* Please request more funds."))
+                        primary_account_holder_id = family_member.primary_account_holder
+
+                        expense_category_name = frappe.get_value(
+                            "Expense Category",
+                            {
+                                "associated_account_holder": primary_account_holder_id,
+                                "category_type": category,
+                            }
+                        )
+                        expense_category_type_doc = frappe.get_doc("Expense Category", expense_category_name)
+                        
+                        expense_category_type_doc.budget += extracted_details.get("amount", 0.0)
+                        expense_category_type_doc.save(ignore_permissions=True)
+                        frappe.db.commit()
+                        keyboard_fm = [
+                            [{"text": "💰 Check Balance", "callback_data": "check_balance"}],
+                            [{ "text": "🛎️ Request Money", "callback_data": "request_money"}]
+                        ]
+                        
+                        send_telegram_message_with_keyboard(chat_id, es_markdown_v2("⚠️ *Insufficient pocket money!* Please request more funds."), keyboard_fm)
                         return
                 except Exception as e:
                     frappe.log_error(f"Error updating family member pocket money: {str(e)}")
