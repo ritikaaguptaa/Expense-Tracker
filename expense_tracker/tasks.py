@@ -737,7 +737,14 @@ We'll automatically update your budgets accordingly ✅
             elif callback_data == "deny":
                 deny_money_request(chat_id)
                 return {"ok": True}
-
+            elif callback_data == "confirm_delete_auto_expense":
+                confirm_delete_auto_expense_handler(chat_id)
+                return {"ok": True}
+            
+            elif callback_data == "cancel_delete_auto_expense":
+                cancel_delete_auto_expense_handler(chat_id)
+                return {"ok": True}
+            
             escaped_message = (
                 message.replace(".", "\\.")
                 .replace("!", "\\!")
@@ -793,8 +800,32 @@ We'll automatically update your budgets accordingly ✅
                     frappe.cache().set_value(f"set_auto_expense_{chat_id}", True)
                     return
                 else:
-                    send_telegram_message(chat_id, "❌ This feature isn’t available on your account.\nIf you think this is a mistake, feel free to reach out to our team.")
+                    send_telegram_message(chat_id, es_markdown_v2("❌ This feature isn’t available on your account.\nIf you think this is a mistake, feel free to reach out to our team."))
                     return
+            
+            elif text == "/delete_auto_expense":
+                if frappe.db.exists("Primary Account", {"telegram_id": chat_id}):
+                    confirm_message = textwrap.dedent("""
+                        ⚠️ *Delete Auto Expense?*
+
+                        This will permanently stop all scheduled recurring expenses from being auto-logged.
+
+                        Are you sure you want to proceed?
+                    """)
+
+                    escaped_message = es_markdown_v2(confirm_message)
+
+                    confirm_keyboard = [
+                        [{"text": "✅ Confirm", "callback_data": "confirm_delete_auto_expense"}],
+                        [{"text": "❌ Cancel", "callback_data": "cancel_delete_auto_expense"}],
+                    ]
+
+                    send_telegram_message_with_keyboard(chat_id, escaped_message, confirm_keyboard)
+                    return
+                else:
+                    send_telegram_message(chat_id, es_markdown_v2("❌ This feature isn’t available on your account.\nIf you think this is a mistake, feel free to reach out to our team."))
+                    return
+
 
             elif "voice" in data["message"]:
                 if frappe.cache.get_value(f"set_budget_{chat_id}"):
@@ -902,6 +933,7 @@ We'll automatically update your budgets accordingly ✅
                                 🔹 *Receive Weekly Summaries* of your spending  
                                 🔹 *Set Monthly Budgets* by category via voice  
                                 🔹 *Auto-Log Recurring Expenses* by sending `/set_auto_expense`
+                                🔹 *Delete Auto Expenses* anytime using `/delete_auto_expense`
                                 🔹 *Get Notified* if a dependent tries to log expenses in unapproved categories  
 
                                 To explore complete insights, manage your dependents, and configure categories:  
@@ -1384,6 +1416,42 @@ def store_auto_expense(chat_id, details):
             ))
         else:
            send_telegram_message(chat_id, es_markdown_v2("❌ *Sorry,* we couldn't process your request due to missing or incomplete information. Please try again with clear details."))
+
+def confirm_delete_auto_expense_handler(chat_id):
+    recurring_expenses = frappe.get_all(
+        "Recurring Expense",
+        filters={"telegram_id": chat_id},
+        fields=["name"]
+    )
+
+    if recurring_expenses:
+        for exp in recurring_expenses:
+            frappe.delete_doc("Recurring Expense", exp.name, ignore_permissions=True)
+        frappe.db.commit()
+
+        message = textwrap.dedent("""
+            ✅ *Auto Expenses Deleted Successfully!*  
+            All your scheduled recurring expenses have been removed.
+
+            You can set them again anytime using `/set_auto_expense`.
+        """)
+    else:
+        message = textwrap.dedent("""
+            ℹ️ *No Auto Expenses Found!*  
+            You don’t have any recurring expenses set up at the moment.
+        """)
+
+    escaped_message = es_markdown_v2(message)
+    send_telegram_message(chat_id, escaped_message)
+
+def cancel_delete_auto_expense_handler(chat_id):
+    message = textwrap.dedent("""
+        ❌ *Deletion Cancelled!*  
+        Your recurring expenses are safe and will continue as scheduled.
+    """)
+
+    escaped_message = es_markdown_v2(message)
+    send_telegram_message(chat_id, escaped_message)
 
 def generate_and_send_report(chat_id):
     try:
