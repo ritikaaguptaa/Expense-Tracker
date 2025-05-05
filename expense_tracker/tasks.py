@@ -819,7 +819,8 @@ We'll automatically update your budgets accordingly ✅
                         [{"text": "✅ Confirm", "callback_data": "confirm_delete_auto_expense"}],
                         [{"text": "❌ Cancel", "callback_data": "cancel_delete_auto_expense"}],
                     ]
-
+                    frappe.cache.set_value(f"delete_auto_expense_{chat_id}", True)
+                    
                     send_telegram_message_with_keyboard(chat_id, escaped_message, confirm_keyboard)
                     return
                 else:
@@ -1418,6 +1419,10 @@ def store_auto_expense(chat_id, details):
            send_telegram_message(chat_id, es_markdown_v2("❌ *Sorry,* we couldn't process your request due to missing or incomplete information. Please try again with clear details."))
 
 def confirm_delete_auto_expense_handler(chat_id):
+
+    if not frappe.cache.get_value(f"delete_auto_expense_{chat_id}"):
+        return
+    
     recurring_expenses = frappe.get_all(
         "Recurring Expense",
         filters={"telegram_id": chat_id},
@@ -1441,15 +1446,20 @@ def confirm_delete_auto_expense_handler(chat_id):
             You don’t have any recurring expenses set up at the moment.
         """)
 
+    frappe.cache.delete_value(f"delete_auto_expense_{chat_id}")
     escaped_message = es_markdown_v2(message)
     send_telegram_message(chat_id, escaped_message)
 
 def cancel_delete_auto_expense_handler(chat_id):
+    if not frappe.cache.get_value(f"delete_auto_expense_{chat_id}"):
+        return
+    
     message = textwrap.dedent("""
         ❌ *Deletion Cancelled!*  
         Your recurring expenses are safe and will continue as scheduled.
     """)
 
+    frappe.cache.delete_value(f"delete_auto_expense_{chat_id}")
     escaped_message = es_markdown_v2(message)
     send_telegram_message(chat_id, escaped_message)
 
