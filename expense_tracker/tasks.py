@@ -924,6 +924,17 @@ We'll automatically update your budgets accordingly ✅
                             return {"ok": False, "error": "Invalid Parent ID"}
 
                         if user_role == "role_parent":
+                            if frappe.db.exists("Primary Account", {"telegram_id": chat_id}):
+                                message = "✅ *You're already registered!* Start tracking your expenses now. 📊"
+                                escaped_message = (
+                                    message.replace(".", "\\.")
+                                    .replace("!", "\\!")
+                                    .replace("_", "\\_")
+                                )
+                                send_telegram_message(chat_id, escaped_message)
+                                frappe.cache().delete_value(f"callback_{chat_id}")
+                                return {"ok": True} 
+
                             message = textwrap.dedent("""
                                 👋 You're now verified as the *Primary Account Holder*.
 
