@@ -353,6 +353,7 @@ def send_email_to_dependent(email, name, primary_name, primary_id):
             subject=subject,
             message=message
         )
+
         return {"status": "success", "message": "Email sent successfully"}
     except Exception as e:
         return {"status": "error", "message": str(e)}

@@ -319,6 +319,8 @@ def extract_and_notify(text, escaped_transcript, chat_id):
             category = escape_markdown_v2(extracted_details.get("category", "N/A"))
             merchant = escape_markdown_v2(extracted_details.get("merchant") or "Not Specified")
 
+            frappe.log_error(f"Error processing family member transaction: {extracted_details}")
+
             is_primary = frappe.db.exists("Primary Account", {"telegram_id": chat_id})
             is_family = frappe.db.exists("Family Member", {"telegram_id": chat_id})
 
@@ -951,7 +953,6 @@ We'll automatically update your budgets accordingly ✅
                             frappe.db.commit()
 
                             send_telegram_message(chat_id, escaped_message)
-                            return {"ok": True}
 
                         elif user_role == "role_dependent":
                             if frappe.db.exists("Family Member", {"telegram_id": chat_id}):
