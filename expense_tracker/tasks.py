@@ -546,7 +546,7 @@ def extract_and_notify(text, escaped_transcript, chat_id):
             except Exception as e:
                 frappe.log_error(f"Error inserting expense record: {str(e)}")
         else:
-            send_telegram_message(chat_id, "❌ Unable to extract details\. Please try again or contact the admin for help\.")
+            send_telegram_message(chat_id, "Unable to extract details\. Please try again or contact the admin for help\.")
     except Exception as e:
         frappe.log_error(f"Unexpected error in extract_and_notify: {str(e)}")
 
