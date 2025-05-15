@@ -705,10 +705,10 @@ def telegram_webhook():
 
             if callback_data == "role_parent":
                 frappe.cache.set_value(f"callback_{chat_id}", callback_data)
-                message = "Please enter your *Parent ID* to continue."
+                message = "Please enter your *Account ID* to continue."
             elif callback_data == "role_dependent":
                 frappe.cache.set_value(f"callback_{chat_id}", callback_data)
-                message = "Please enter your *Parent ID* for verification."
+                message = "Please enter your *Account ID* for verification."
             elif callback_data == "check_balance":
                 message = get_balance(chat_id)
             elif callback_data == "add_money":
