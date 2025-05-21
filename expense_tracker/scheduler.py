@@ -4,36 +4,6 @@ import textwrap
 from datetime import datetime, timedelta
 from expense_tracker.tasks import send_telegram_message_with_keyboard, send_telegram_message
 
-# @frappe.whitelist(allow_guest=True)
-# def monthly_add_money_reminder():
-#     primary_accounts = frappe.get_all("Primary Account", fields=["telegram_id", "full_name"])
-
-#     for account in primary_accounts:
-#         chat_id = account["telegram_id"]
-#         full_name = account["full_name"]
-
-#         message = f"""
-#         🔔 *Monthly Budget Reminder* 🔔  
-
-#         Hello {full_name},  
-#         It's the start of a new month! 🚀  
-#         Please ensure your budget is updated to manage your expenses smoothly.  
-
-#         ➕ Tap below to set your budget for this month! 👇
-#         """
-#         message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*")
-
-#         keyboard = [
-#             [{"text": "📊 Set Monthly Budget", "callback_data": "set_monthly_budget"}]
-#         ]
-        
-#         escaped_message = message.replace(".", "\\.").replace("!", "\\!").replace("*", "\\*").replace("_", "\\_")
-#         send_telegram_message_with_keyboard(chat_id, escaped_message, keyboard)
-#         frappe.logger().info(f"Sent reminder to {full_name} ({chat_id})")
-
-#     frappe.logger().info("Monthly Budget Reminder completed.")
-#     return {"status": "success", "message": "Reminders sent to all users."}
-
 def es_markdown_v2(text):
     escape_chars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!']
     return "".join(f"\\{char}" if char in escape_chars else char for char in text)
@@ -47,7 +17,6 @@ def monthly_add_money_reminder():
         full_name = account.get("full_name")
 
         if not chat_id:
-            frappe.logger().warning(f"Skipping user {full_name} due to missing Telegram ID")
             continue
 
         message = textwrap.dedent(f"""
@@ -66,9 +35,7 @@ def monthly_add_money_reminder():
         ]
         
         send_telegram_message_with_keyboard(chat_id, escaped_message, keyboard)
-        frappe.logger().info(f"Sent reminder to {full_name} ({chat_id})")
 
-    frappe.logger().info("Monthly Budget Reminder completed.")
     return {"status": "success", "message": "Reminders sent to all users."}
 
 @frappe.whitelist(allow_guest=True)
@@ -188,7 +155,6 @@ def notify_family_on_low_pocket_money():
         primary_account_holder = member.get("primary_account_holder")
 
         if not member_telegram_id or member_pocket_money is None:
-            frappe.logger().warning(f"Skipping {member_full_name} due to missing Telegram ID or pocket money")
             continue
 
         primary_account = frappe.get_value(
@@ -198,7 +164,6 @@ def notify_family_on_low_pocket_money():
         )
 
         if not primary_account:
-            frappe.logger().warning(f"No primary account found for {member_full_name}")
             continue
 
         default_pocket_money = primary_account
@@ -216,9 +181,7 @@ def notify_family_on_low_pocket_money():
             escaped_message = message.replace(".", "\\.").replace("!", "\\!")
             
             send_telegram_message(member_telegram_id, escaped_message)
-            frappe.logger().info(f"Sent low pocket money alert to {member_full_name} ({member_telegram_id})")
 
-    frappe.logger().info("Low Pocket Money Notification completed.")
     return {"status": "success", "message": "Low pocket money reminders sent to all family members."}
 
 
@@ -237,7 +200,6 @@ def notify_dependents_about_savings():
         member_rollover_savings = member.get("rollover_savings", 0)
 
         if not member_telegram_id:
-            frappe.logger().warning(f"Skipping {member_full_name} due to missing Telegram ID")
             continue
 
         # remaining_pocket_money = max(0, member_pocket_money - member_total_expense)
@@ -257,9 +219,7 @@ def notify_dependents_about_savings():
         escaped_message = message.replace(".", "\\.").replace("!", "\\!")
 
         send_telegram_message(member_telegram_id, escaped_message)
-        frappe.logger().info(f"Sent savings update to {member_full_name} ({member_telegram_id})")
 
-    frappe.logger().info("Savings Notification completed.")
     return {"status": "success", "message": "Savings notifications sent to all dependents."}
 
 @frappe.whitelist(allow_guest=True)
