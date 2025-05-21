@@ -322,7 +322,6 @@ def extract_and_notify(text, escaped_transcript, chat_id):
             is_primary = frappe.db.exists("Primary Account", {"telegram_id": chat_id})
             is_family = frappe.db.exists("Family Member", {"telegram_id": chat_id})
 
-            frappe.logger().info(f"Extracted Details: {extracted_details}, Chat ID: {chat_id}, Is Primary: {is_primary}, Is Family: {is_family}")
 
             if is_family:
                 try:
@@ -650,14 +649,9 @@ def send_telegram_message_with_keyboard(chat_id, message, keyboard):
     try:
         response = requests.post(url, json=payload)
         response_data = response.json()
-        print(response_data)
 
-        if not response_data.get("ok"):
-            frappe.logger().error(
-                f"Failed to send Telegram notification: {response_data}"
-            )
     except Exception as e:
-        frappe.logger().error(f"Error sending Telegram message: {str(e)}")
+        frappe.log_error(f"Error sending Telegram message: {str(e)}")
 
 def send_pdf_to_telegram(chat_id, file_path):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument"

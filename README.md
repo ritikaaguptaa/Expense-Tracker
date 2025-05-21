@@ -15,6 +15,7 @@
 <br>
 <div align="center">
     <a href="https://two-korecent.frappe.cloud/frontend/">Website</a>
+	<a href=".github/demo_video/finly-demo-video.mp4">Demo Video</a>
 </div>
 
 ## Finly
